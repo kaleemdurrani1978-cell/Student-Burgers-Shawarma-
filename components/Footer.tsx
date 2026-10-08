@@ -12,7 +12,7 @@ interface FooterProps {
 export default function Footer({
   phone = '0309-4222283',
   whatsappNumber = '923094222283',
-  address = 'Shalimar Link Road, Lahore, Pakistan',
+  address = '61 Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan',
 }: FooterProps) {
   return (
     <footer className="bg-zinc-950 border-t border-zinc-800 text-zinc-400 text-sm">

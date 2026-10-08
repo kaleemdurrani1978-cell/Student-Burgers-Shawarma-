@@ -80,7 +80,7 @@ export default function Navbar({
               <div className="hidden lg:flex items-center gap-2 text-[11px] text-zinc-400 font-medium">
                 <span className="text-amber-400 font-bold uppercase tracking-wider">Fast Food</span>
                 <span>•</span>
-                <span>Shalimar Link Rd, Lahore</span>
+                <span>61 Shalimar Link Road, Ramgarh, Lahore</span>
               </div>
             </div>
           </Link>

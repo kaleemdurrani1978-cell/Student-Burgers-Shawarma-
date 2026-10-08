@@ -106,7 +106,7 @@ function MenuContent() {
         <div className="container mx-auto max-w-5xl text-center space-y-4">
           <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 rounded-full text-xs font-bold text-amber-400">
             <CheckCircle className="w-4 h-4 text-amber-400" />
-            <span>Authoritative Printed Menu Pricing • Shalimar Link Rd, Lahore</span>
+            <span>Authoritative Printed Menu Pricing • 61 Shalimar Link Road, Ramgarh, Lahore</span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-black italic tracking-tight text-white">

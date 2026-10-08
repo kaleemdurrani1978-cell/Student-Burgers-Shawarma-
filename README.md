@@ -8,7 +8,7 @@ A complete, production-ready, mobile-first food ordering web application, WhatsA
 
 This application uses the current menu and business information supplied by the restaurant owner:
 * **Business Public Name:** Student Pizza & Fastfood
-* **Primary Location:** Shalimar Link Road, Lahore, Punjab, Pakistan
+* **Primary Location:** 61 Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan
 * **Contact & WhatsApp Candidate:** `0309-4222283` (+92 309 4222283)
 * **International WhatsApp Format:** `923094222283`
 * **Facebook Page:** [Student Pizza & Fastfood](https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/)
@@ -168,7 +168,7 @@ The application runs out-of-the-box using its built-in local persistent database
 To achieve visibility on Google Maps and search results in Lahore:
 1. **Google Business Profile:**
    * Go to [business.google.com](https://business.google.com).
-   * Claim or create **"Student Pizza & Fastfood"** on **Shalimar Link Road, Lahore**.
+   * Claim or create **"Student Pizza & Fastfood"** at **61 Shalimar Link Road, Ramgarh, Lahore**.
    * Set category to *Shawarma Restaurant / Fast Food Restaurant*.
    * Add the deployed website URL as the official Website and Menu link.
    * Add phone number `0309-4222283`.

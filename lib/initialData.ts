@@ -662,9 +662,9 @@ export const initialBusinessSettings: BusinessSettings = {
   phoneCandidate: '0309-4222283',
   whatsappNumberFormatted: '923094222283',
   isWhatsAppConfirmedByOwner: false, // Flagged pending owner confirmation per instructions
-  address: 'Shalimar Link Road, Lahore, Pakistan',
+  address: '61 Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan',
   city: 'Lahore',
-  googleMapsUrl: 'https://maps.google.com/?q=Shalimar+Link+Road+Lahore',
+  googleMapsUrl: 'https://maps.google.com/?q=61+Shalimar+Link+Road,+Ramgarh,+Lahore',
   facebookUrl: 'https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/',
   openingHoursFormatted: 'Hours will be updated soon',
   isSundayOff: false,

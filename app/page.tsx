@@ -53,7 +53,7 @@ export default async function HomePage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                 <span className="text-xs font-bold text-zinc-300">Dine-In, Takeaway &amp; Delivery</span>
                 <span className="text-zinc-600">|</span>
-                <span className="text-xs font-semibold text-amber-400">Shalimar Link Rd, Lahore</span>
+                <span className="text-xs font-semibold text-amber-400">61 Shalimar Link Road, Ramgarh, Lahore</span>
               </div>
 
               {/* Title with authentic fast-food typography */}

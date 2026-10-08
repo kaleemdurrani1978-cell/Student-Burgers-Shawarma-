@@ -174,6 +174,15 @@ function loadDatabase(): DatabaseSchema {
         database.dealMenuVersion = 6;
         persistDatabase(database);
       }
+      if ((database.dealMenuVersion ?? 0) < 7) {
+        database.settings = {
+          ...database.settings,
+          address: initialBusinessSettings.address,
+          googleMapsUrl: initialBusinessSettings.googleMapsUrl,
+        };
+        database.dealMenuVersion = 7;
+        persistDatabase(database);
+      }
       if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
         database.settings.restaurantName = initialBusinessSettings.restaurantName;
         database.settings.urduName = initialBusinessSettings.urduName;
@@ -187,7 +196,7 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
-    dealMenuVersion: 6,
+    dealMenuVersion: 7,
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],

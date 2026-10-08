@@ -1,6 +1,6 @@
 -- =========================================================================
 -- STUDENT PIZZA & FASTFOOD — PRODUCTION SUPABASE / POSTGRES SCHEMA
--- Location: Shalimar Link Road, Lahore
+-- Location: 61 Shalimar Link Road, Ramgarh, Lahore
 -- =========================================================================
 
 -- Enable uuid-ossp extension

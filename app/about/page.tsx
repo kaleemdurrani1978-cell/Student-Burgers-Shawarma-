@@ -57,7 +57,7 @@ export default function AboutPage() {
               Authentic Fast-Food Heritage
             </h2>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Student Pizza &amp; Fastfood is an independent local Pakistani fast-food restaurant situated on Shalimar Link Road in Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast-food enthusiasts across the area.
+              Student Pizza &amp; Fastfood is an independent local Pakistani fast-food restaurant at 61 Shalimar Link Road, Ramgarh, Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast-food enthusiasts across the area.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-300 font-semibold">
@@ -84,7 +84,7 @@ export default function AboutPage() {
             <div className="space-y-3 text-xs text-zinc-300">
               <p>
                 <strong className="text-white block mb-0.5">Physical Address:</strong>
-                Shalimar Link Road, Lahore, Punjab, Pakistan
+                61 Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan
               </p>
               <p>
                 <strong className="text-white block mb-0.5">Service Radius:</strong>
@@ -92,7 +92,7 @@ export default function AboutPage() {
               </p>
               <div className="pt-2">
                 <a
-                  href="https://maps.google.com/?q=Shalimar+Link+Road+Lahore"
+                  href="https://maps.google.com/?q=61+Shalimar+Link+Road,+Ramgarh,+Lahore"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-amber-400 px-4 py-2.5 rounded-xl font-bold transition-colors"

@@ -9,12 +9,12 @@ import TableParamDetector from '@/components/TableParamDetector';
 export const metadata: Metadata = {
   title: 'Student Pizza & Fastfood | Shawarma, Burgers & Deals (Lahore)',
   description:
-    'Authentic chicken shawarma, zinger burgers, platters, paratha rolls, and budget student deals in Shalimar Link Road, Lahore. Order direct on WhatsApp or Dine-In with QR.',
+    'Authentic chicken shawarma, zinger burgers, platters, paratha rolls, and budget student deals at 61 Shalimar Link Road, Ramgarh, Lahore. Order direct on WhatsApp or Dine-In with QR.',
   keywords: [
     'Student Pizza & Fastfood',
     'Student Pizza & Fastfood Lahore',
     'Student Pizza Fastfood Lahore',
-    'Shalimar Link Road Lahore food',
+    '61 Shalimar Link Road Ramgarh Lahore food',
     'Zinger burger Lahore',
     'Shawarma delivery Lahore',
     'Student Deals fast food',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Student Pizza & Fastfood | Shalimar Link Road, Lahore',
+    title: 'Student Pizza & Fastfood | 61 Shalimar Link Road, Ramgarh, Lahore',
     description:
       'Craving fresh, spicy chicken shawarma and crispy zinger burgers? View our verified menu and order directly via WhatsApp or scan table QR to dine in!',
     url: '/',
@@ -72,8 +72,8 @@ export default function RootLayout({
     servesCuisine: ['Fast Food', 'Pakistani', 'Shawarma', 'Burgers'],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Shalimar Link Road',
-      addressLocality: 'Lahore',
+      streetAddress: '61 Shalimar Link Road',
+      addressLocality: 'Ramgarh, Lahore',
       addressRegion: 'Punjab',
       postalCode: '54000',
       addressCountry: 'PK',

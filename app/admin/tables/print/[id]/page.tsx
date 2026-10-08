@@ -114,7 +114,7 @@ export default function TablePrintStandeePage({
 
         {/* Footer */}
         <div className="pt-2 border-t border-zinc-200 w-full flex items-center justify-between text-[9px] text-zinc-500 font-semibold">
-          <span>Shalimar Link Road, Lahore</span>
+          <span>61 Shalimar Link Road, Ramgarh, Lahore</span>
           <span>WhatsApp: 0309-4222283</span>
         </div>
       </div>
