@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 120" width="100%" height="100%" fill="none">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="1" flood-color="#b91c1c" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444" />
+      <stop offset="100%" stop-color="#B91C1C" />
+    </linearGradient>
+  </defs>
+
+  <!-- Mascot Badge Circle -->
+  <g transform="translate(10, 10)">
+    <circle cx="50" cy="50" r="48" fill="url(#yellowGrad)" stroke="#18181B" stroke-width="4"/>
+    <circle cx="50" cy="50" r="42" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+    
+    <!-- Cartoon Mascot Illustration (reconstructed faithfully from printed menu) -->
+    <!-- Red Hat -->
+    <path d="M 28 36 C 28 22, 72 22, 72 36 Z" fill="#DC2626" stroke="#991B1B" stroke-width="2"/>
+    <ellipse cx="50" cy="36" rx="28" ry="7" fill="#EF4444" stroke="#991B1B" stroke-width="2"/>
+    
+    <!-- Face -->
+    <circle cx="50" cy="46" r="14" fill="#FED7AA" stroke="#18181B" stroke-width="1.5"/>
+    <!-- Eyes -->
+    <ellipse cx="45" cy="44" rx="2" ry="3" fill="#18181B"/>
+    <ellipse cx="55" cy="44" rx="2" ry="3" fill="#18181B"/>
+    <circle cx="46" cy="43" r="0.75" fill="#FFFFFF"/>
+    <circle cx="56" cy="43" r="0.75" fill="#FFFFFF"/>
+    <!-- Smile & Cheeks -->
+    <path d="M 44 49 Q 50 56 56 49" stroke="#991B1B" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="42" cy="47" rx="2.5" ry="1.5" fill="#FCA5A5"/>
+    <ellipse cx="58" cy="47" rx="2.5" ry="1.5" fill="#FCA5A5"/>
+    
+    <!-- Red Body / Shirt -->
+    <path d="M 38 60 L 62 60 L 66 84 L 34 84 Z" fill="#DC2626" stroke="#991B1B" stroke-width="2"/>
+    
+    <!-- Yellow Dungarees / Overalls with Straps -->
+    <path d="M 40 68 L 60 68 L 62 88 L 38 88 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="2"/>
+    <!-- Straps -->
+    <path d="M 40 60 L 44 68 L 41 84" stroke="#CA8A04" stroke-width="2.5" fill="none"/>
+    <path d="M 60 60 L 56 68 L 59 84" stroke="#CA8A04" stroke-width="2.5" fill="none"/>
+    <circle cx="43" cy="69" r="1.5" fill="#18181B"/>
+    <circle cx="57" cy="69" r="1.5" fill="#18181B"/>
+    <!-- Pocket -->
+    <rect x="46" y="73" width="8" height="6" rx="1.5" fill="#EAB308" stroke="#CA8A04" stroke-width="1"/>
+    
+    <!-- Pointing Arm (Right arm gesturing towards brand text) -->
+    <path d="M 62 64 Q 74 62 82 56" stroke="#DC2626" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Hand -->
+    <circle cx="83" cy="55" r="3.5" fill="#FED7AA"/>
+    <path d="M 83 55 L 89 53" stroke="#FED7AA" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Typography: STUDENT SHAWARMA -->
+  <g transform="translate(125, 20)">
+    <!-- STUDENT text -->
+    <text x="0" y="38" font-family="'Impact', 'Arial Black', sans-serif" font-size="40" font-weight="900" font-style="italic" fill="#DC2626" letter-spacing="1.5" filter="url(#shadow)">
+      STUDENT
+    </text>
+    
+    <!-- SHAWARMA text -->
+    <text x="188" y="38" font-family="'Impact', 'Arial Black', sans-serif" font-size="40" font-weight="900" font-style="italic" fill="#F59E0B" letter-spacing="1.5" stroke="#78350F" stroke-width="1">
+      SHAWARMA
+    </text>
+
+    <!-- Subtitle: PIZZA & FAST FOOD -->
+    <rect x="0" y="48" width="375" height="24" rx="6" fill="#18181B"/>
+    <text x="12" y="65" font-family="'Arial', sans-serif" font-size="12" font-weight="800" fill="#FACC15" letter-spacing="2.5">
+      PIZZA &amp; FAST FOOD
+    </text>
+    <circle cx="178" cy="60" r="2.5" fill="#EF4444"/>
+    <text x="188" y="65" font-family="'Arial', sans-serif" font-size="11" font-weight="700" fill="#F3F4F6" letter-spacing="1.5">
+      SHALIMAR LINK RD, LAHORE
+    </text>
+
+    <!-- Urdu Subtitle -->
+    <text x="360" y="90" text-anchor="end" font-family="'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', sans-serif" font-size="13" font-weight="bold" fill="#71717A">
+      سٹوڈنٹ شوارما اینڈ فاسٹ فوڈ
+    </text>
+  </g>
+</svg>

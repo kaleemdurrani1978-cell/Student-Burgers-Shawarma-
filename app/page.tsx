@@ -1,69 +1,431 @@
-import Image from "next/image";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import {
+  Flame,
+  ArrowRight,
+  Clock,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  CheckCircle2,
+  Utensils,
+  Bike,
+  Sparkles,
+  QrCode,
+} from 'lucide-react';
+import { getProducts, getDeals, getBusinessSettings } from '@/lib/db';
+import ProductCard from '@/components/ProductCard';
+import DealCard from '@/components/DealCard';
 
-export default function Home() {
+export default async function HomePage() {
+  const [products, deals, settings] = await Promise.all([
+    getProducts(),
+    getDeals(),
+    getBusinessSettings(),
+  ]);
+
+  // Determine current day of week and open status
+  const now = new Date();
+  const day = now.getDay(); // 0 is Sunday
+  const isSunday = day === 0;
+  const isOpen = !isSunday; // Mon-Sat open
+
+  // Select top featured items from real verified list
+  const popularShawarma = products.filter((p) => p.isFeatured && p.categoryId === 'shawarma').slice(0, 4);
+  const popularBurgers = products.filter((p) => p.categoryId === 'burgers').slice(0, 3);
+  const featuredDeals = deals.slice(0, 4); // Top 4 deals including Deal 3, 4, 13, 14
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex flex-col min-h-screen">
+      {/* Announcement Bar */}
+      {settings.isAnnouncementActive && settings.announcementText && (
+        <div className="bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white py-2 px-4 text-center text-xs font-bold tracking-wide shadow-inner">
+          <p className="container mx-auto flex items-center justify-center gap-2">
+            <span>📢</span>
+            <span>{settings.announcementText}</span>
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      )}
+
+      {/* Hero Section */}
+      <section className="relative bg-zinc-950 overflow-hidden border-b border-zinc-800">
+        {/* Ambient Gradient Glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container mx-auto px-4 py-12 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Headlines & CTAs */}
+            <div className="lg:col-span-7 flex flex-col gap-6 text-left">
+              {/* Status Badge */}
+              <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full w-fit">
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    isOpen ? 'bg-emerald-500 animate-ping' : 'bg-red-500'
+                  }`}
+                />
+                <span className="text-xs font-bold text-zinc-300">
+                  {isOpen ? 'Open Now (1:00 PM – 1:00 AM)' : 'Closed Today (Sunday Off)'}
+                </span>
+                <span className="text-zinc-600">|</span>
+                <span className="text-xs font-semibold text-amber-400">Shalimar Link Rd, Lahore</span>
+              </div>
+
+              {/* Title with authentic fast-food typography */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-red-600 text-white font-black text-xs px-2.5 py-0.5 rounded tracking-wider uppercase">
+                    Original Lahore Brand
+                  </span>
+                  <span className="text-xs text-amber-400 font-urdu font-bold">
+                    سٹوڈنٹ شوارما اینڈ فاسٹ فوڈ
+                  </span>
+                </div>
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black italic tracking-tight text-white leading-[1.05]">
+                  FRESH, JUICY <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 drop-shadow-sm">
+                    SHAWARMA
+                  </span>{' '}
+                  &amp; CRISPY{' '}
+                  <span className="text-red-600 drop-shadow-sm">ZINGER</span>
+                </h1>
+              </div>
+
+              {/* Verified Subtitle */}
+              <p className="text-base sm:text-lg text-zinc-300 max-w-xl leading-relaxed">
+                Authentic chicken shawarma rolls starting from just{' '}
+                <strong className="text-amber-400 font-black">Rs. 130</strong>, golden paratha rolls,
+                and high-value <strong className="text-amber-400">Student Deals</strong> prepared with
+                signature secret garlic mayo.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link
+                  href="/menu"
+                  className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black px-7 py-4 rounded-2xl flex items-center gap-3 text-base shadow-xl shadow-amber-500/20 active:scale-95 transition-all"
+                >
+                  <Utensils className="w-5 h-5" />
+                  <span>Order Now • View Menu</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+
+                <Link
+                  href="/qr"
+                  className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 font-bold px-5 py-4 rounded-2xl flex items-center gap-2.5 text-sm transition-all"
+                >
+                  <QrCode className="w-5 h-5 text-amber-400" />
+                  <span>Dine-In Table QR</span>
+                </Link>
+
+                <a
+                  href={`https://wa.me/${settings.whatsappNumberFormatted}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 font-bold px-5 py-4 rounded-2xl flex items-center gap-2 text-sm transition-all"
+                >
+                  <Phone className="w-4 h-4 text-emerald-400" />
+                  <span>WhatsApp: {settings.phoneCandidate}</span>
+                </a>
+              </div>
+
+              {/* Verified Features Pills */}
+              <div className="grid grid-cols-3 gap-2 pt-4 border-t border-zinc-800/80 max-w-lg text-xs text-zinc-400">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>100% Real Menu Prices</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Bike className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Delivery Available</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Utensils className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Table QR Dine-In</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Hero Visual Feast */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative mx-auto max-w-md aspect-square rounded-3xl overflow-hidden border-4 border-amber-500/40 shadow-2xl shadow-amber-500/10 bg-zinc-900">
+                <Image
+                  src="/images/hero/hero-food-banner.webp"
+                  alt="Student Shawarma Feast"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  priority
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-transparent" />
+
+                {/* Floating Mascot Badge */}
+                <div className="absolute top-4 right-4 bg-zinc-950/90 border border-amber-400 rounded-2xl p-2.5 flex items-center gap-2.5 shadow-xl backdrop-blur-md">
+                  <div className="w-10 h-10 rounded-full bg-amber-400 p-0.5 overflow-hidden flex items-center justify-center">
+                    <Image
+                      src="/images/branding/icon-192.png"
+                      alt="Student Mascot"
+                      width={40}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-black text-amber-400 block leading-none">
+                      Student Special
+                    </span>
+                    <span className="text-xs font-black text-white">Deal Starting Rs. 250</span>
+                  </div>
+                </div>
+
+                {/* Floating Bottom Card */}
+                <div className="absolute bottom-4 left-4 right-4 bg-zinc-900/95 border border-zinc-800 rounded-2xl p-3.5 flex items-center justify-between backdrop-blur-md">
+                  <div>
+                    <span className="text-[10px] text-zinc-400 uppercase font-bold block">
+                      Authentic Pakistani Taste
+                    </span>
+                    <span className="text-xs font-extrabold text-white">
+                      Zinger • Tikka • Shami • Shawarma
+                    </span>
+                  </div>
+                  <Link
+                    href="/menu"
+                    className="bg-amber-500 hover:bg-amber-400 text-zinc-950 px-3 py-1.5 rounded-xl text-xs font-black transition-colors"
+                  >
+                    View All
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Category Shortcut Badges */}
+      <section className="bg-zinc-900/80 border-b border-zinc-800 py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-zinc-400">
+              Browse Categories
+            </h2>
+            <Link href="/menu" className="text-xs font-bold text-amber-400 hover:underline">
+              See All 28 Items →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {[
+              { id: 'deals', name: 'Student Deals', count: '12 Deals', icon: '🔥', highlight: true },
+              { id: 'shawarma', name: 'Shawarma', count: '8 Varieties', icon: '🌯' },
+              { id: 'platters-rolls', name: 'Platters & Rolls', count: '4 Items', icon: '🥙' },
+              { id: 'burgers', name: 'Burgers', count: '5 Varieties', icon: '🍔' },
+              { id: 'chicken-snacks', name: 'Wings & Snacks', count: '4 Items', icon: '🍗' },
+              { id: 'sandwiches', name: 'Sandwiches', count: '4 Items', icon: '🥪' },
+            ].map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/menu?category=${cat.id}`}
+                className={`p-3.5 rounded-2xl border transition-all text-center flex flex-col items-center justify-center gap-1 group ${
+                  cat.highlight
+                    ? 'bg-amber-500/10 border-amber-500/50 hover:bg-amber-500/20'
+                    : 'bg-zinc-950 border-zinc-800 hover:border-amber-500/40 hover:bg-zinc-900'
+                }`}
+              >
+                <span className="text-2xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <span className="text-xs font-bold text-white group-hover:text-amber-400">
+                  {cat.name}
+                </span>
+                <span className="text-[10px] text-zinc-400">{cat.count}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Student Deals Section */}
+      <section className="py-16 bg-zinc-950 border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-amber-500 text-zinc-950 font-black text-xs px-2.5 py-0.5 rounded uppercase">
+                  Budget Friendly
+                </span>
+                <span className="text-xs text-amber-400 font-urdu font-bold">سٹوڈنٹ ڈیلز</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-white">
+                Famous <span className="text-amber-400">Student Deals</span>
+              </h2>
+              <p className="text-xs text-zinc-400 mt-1">
+                Every deal includes fresh crispy fries and cold drink. Verified from printed menu.
+              </p>
+            </div>
+            <Link
+              href="/menu?category=deals"
+              className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-bold text-sm bg-zinc-900 px-4 py-2.5 rounded-xl border border-zinc-800 hover:border-amber-500/50 w-fit"
+            >
+              <span>View All 12 Student Deals</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredDeals.map((deal) => (
+              <DealCard key={deal.id} deal={deal} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Signature Shawarmas */}
+      <section className="py-16 bg-zinc-900/40 border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-red-600 text-white font-black text-xs px-2.5 py-0.5 rounded uppercase">
+                  House Specialty
+                </span>
+                <span className="text-xs text-amber-400 font-urdu font-bold">شوارما</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-white">
+                Signature <span className="text-amber-400">Shawarma</span> Rolls
+              </h2>
+              <p className="text-xs text-zinc-400 mt-1">
+                Prepared with hot spiced chicken, crisp pickles, and our proprietary garlic mayo.
+              </p>
+            </div>
+            <Link
+              href="/menu?category=shawarma"
+              className="text-amber-400 hover:underline font-bold text-sm"
+            >
+              Explore all 8 Shawarmas →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {popularShawarma.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Burgers */}
+      <section className="py-16 bg-zinc-950 border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-amber-500 text-zinc-950 font-black text-xs px-2.5 py-0.5 rounded uppercase">
+                  Lahore Street Style &amp; Crispy
+                </span>
+                <span className="text-xs text-amber-400 font-urdu font-bold">برگر</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-white">
+                Crispy Zinger &amp; <span className="text-red-500">Shami Burgers</span>
+              </h2>
+            </div>
+            <Link
+              href="/menu?category=burgers"
+              className="text-amber-400 hover:underline font-bold text-sm"
+            >
+              View all burgers →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {popularBurgers.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Dine-In QR Ordering Feature Box */}
+      <section className="py-16 bg-gradient-to-b from-zinc-900 to-zinc-950 border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="bg-zinc-900 border border-amber-500/30 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold text-amber-300">
+                  <QrCode className="w-4 h-4 text-amber-400" />
+                  <span>Contactless Table Service</span>
+                </div>
+                <h3 className="text-2xl md:text-4xl font-black text-white">
+                  Dine-In At Our Restaurant? <br />
+                  <span className="text-amber-400">Scan Your Table QR Code to Order</span>
+                </h3>
+                <p className="text-sm text-zinc-400 max-w-xl leading-relaxed">
+                  Every dining table at Student Shawarma features a unique QR standee. Scan with your
+                  smartphone camera to load the live menu with your table number pre-selected, order directly,
+                  and relax while our kitchen prepares your meal.
+                </p>
+                <div className="pt-2 flex flex-wrap gap-4">
+                  <Link
+                    href="/qr"
+                    className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black px-6 py-3 rounded-xl text-sm transition-all"
+                  >
+                    Select Table / Scan QR
+                  </Link>
+                  <Link
+                    href="/admin/tables"
+                    className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-5 py-3 rounded-xl text-xs font-semibold flex items-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-400" />
+                    <span>Print QR Stands (Admin)</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 flex justify-center">
+                <div className="bg-white p-6 rounded-3xl shadow-2xl text-zinc-950 text-center max-w-xs w-full">
+                  <div className="w-12 h-12 bg-amber-400 rounded-full mx-auto mb-2 flex items-center justify-center font-black text-sm">
+                    T01
+                  </div>
+                  <h4 className="font-black text-base">Table 01 QR</h4>
+                  <p className="text-[11px] text-zinc-600 mb-3">Student Shawarma Lahore</p>
+                  <div className="aspect-square bg-zinc-100 rounded-xl p-2 border border-zinc-200 flex items-center justify-center">
+                    <QrCode className="w-32 h-32 text-zinc-900" />
+                  </div>
+                  <p className="text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-wider">
+                    Scan With Phone Camera
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Verified Business Information Card */}
+      <section className="py-12 bg-zinc-950">
+        <div className="container mx-auto px-4">
+          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <h3 className="text-lg font-bold text-white">Verified Business Information</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-zinc-400">
+              <div className="space-y-1">
+                <p className="text-zinc-500 uppercase font-black text-[10px]">Location</p>
+                <p className="text-zinc-200 font-semibold">{settings.address}</p>
+                <p className="text-zinc-400">{settings.city}, Pakistan</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-zinc-500 uppercase font-black text-[10px]">Direct Contact</p>
+                <p className="text-zinc-200 font-semibold">Phone: {settings.phoneCandidate}</p>
+                <p className="text-emerald-400 font-semibold">WhatsApp: +{settings.whatsappNumberFormatted}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-zinc-500 uppercase font-black text-[10px]">Operating Hours</p>
+                <p className="text-zinc-200 font-semibold">{settings.openingHoursFormatted}</p>
+                <p className="text-red-400 font-bold">Strictly Closed on Sundays (Sunday Off)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
