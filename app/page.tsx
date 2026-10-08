@@ -79,7 +79,7 @@ export default async function HomePage() {
               {/* Verified Subtitle */}
               <p className="text-base sm:text-lg text-zinc-300 max-w-xl leading-relaxed">
                 Authentic chicken shawarma rolls starting from just{' '}
-                <strong className="text-amber-400 font-black">Rs. 130</strong>, golden paratha rolls,
+                <strong className="text-amber-400 font-black">Rs. 150</strong>, golden paratha rolls,
                 and high-value <strong className="text-amber-400">Student Deals</strong> prepared with
                 signature secret garlic mayo.
               </p>
