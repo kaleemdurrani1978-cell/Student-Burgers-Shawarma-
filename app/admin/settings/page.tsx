@@ -164,19 +164,6 @@ export default function AdminSettingsPage() {
               />
             </div>
 
-            <div className="flex items-center pt-5">
-              <label className="flex items-center gap-2 cursor-pointer text-xs">
-                <input
-                  type="checkbox"
-                  checked={settings.isSundayOff}
-                  onChange={(e) => setSettings({ ...settings, isSundayOff: e.target.checked })}
-                  className="rounded border-zinc-700 text-amber-500"
-                />
-                <span className="text-red-400 font-bold">
-                  Sunday Closed / Off (&quot;SUNDAY OFF&quot; per menu card)
-                </span>
-              </label>
-            </div>
           </div>
         </div>
 

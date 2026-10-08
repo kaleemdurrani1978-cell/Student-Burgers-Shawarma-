@@ -13,7 +13,6 @@ import {
   ToggleLeft,
   ToggleRight,
   ShieldCheck,
-  RefreshCw,
 } from 'lucide-react';
 import { Product } from '@/types';
 
@@ -25,6 +24,7 @@ export default function AdminMenuPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState('');
 
   const fetchProducts = async () => {
     try {
@@ -97,6 +97,34 @@ export default function AdminMenuPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !editingProduct) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setImageUploadError('Choose a JPG, PNG, or WebP image.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setImageUploadError('Image must be 2 MB or smaller.');
+      return;
+    }
+
+    setImageUploadError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result;
+      if (typeof imageData === 'string') {
+        setEditingProduct((product) =>
+          product ? { ...product, image: imageData } : product
+        );
+      } else {
+        setImageUploadError('Could not read this image file.');
+      }
+    };
+    reader.onerror = () => setImageUploadError('Could not read this image file.');
+    reader.readAsDataURL(file);
   };
 
   const handleAddNew = () => {
@@ -172,11 +200,16 @@ export default function AdminMenuPage() {
             className="bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 font-bold focus:outline-none focus:border-amber-400"
           >
             <option value="all">All Categories ({products.length})</option>
-            <option value="shawarma">Shawarma (شوارما)</option>
-            <option value="platters-rolls">Platters &amp; Parathas</option>
-            <option value="burgers">Burgers (برگر)</option>
-            <option value="chicken-snacks">Crispy Chicken &amp; Wings</option>
-            <option value="sandwiches">Sandwiches (سینڈوچ)</option>
+            <option value="shawarma">Shawarma</option>
+            <option value="platters-rolls">Platters &amp; Rolls</option>
+            <option value="zinger-burgers">Zinger Burgers</option>
+            <option value="shami-burgers">Shami Burgers</option>
+            <option value="chicken-burgers">Chicken Burgers</option>
+            <option value="shappatta-rolls">Shappatta Roll</option>
+            <option value="paratha-rolls">Paratha Rolls</option>
+            <option value="fries">Fries</option>
+            <option value="sandwiches">Sandwiches</option>
+            <option value="soups">Soup</option>
             <option value="addons">Extras &amp; Add-ons</option>
           </select>
         </div>
@@ -337,27 +370,45 @@ export default function AdminMenuPage() {
                     }
                     className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white"
                   >
-                    <option value="shawarma">Shawarma</option>
-                    <option value="platters-rolls">Platters &amp; Parathas</option>
-                    <option value="burgers">Burgers</option>
-                    <option value="chicken-snacks">Crispy Chicken &amp; Wings</option>
-                    <option value="sandwiches">Sandwiches</option>
-                    <option value="addons">Extras &amp; Add-ons</option>
+                    {[
+                      ['shawarma', 'Shawarma'],
+                      ['platters-rolls', 'Platters & Rolls'],
+                      ['zinger-burgers', 'Zinger Burgers'],
+                      ['shami-burgers', 'Shami Burgers'],
+                      ['chicken-burgers', 'Chicken Burgers'],
+                      ['shappatta-rolls', 'Shappatta Roll'],
+                      ['paratha-rolls', 'Paratha Rolls'],
+                      ['fries', 'Fries'],
+                      ['sandwiches', 'Sandwiches'],
+                      ['soups', 'Soup'],
+                      ['addons', 'Extras & Add-ons'],
+                    ].map(([id, label]) => (
+                      <option key={id} value={id}>{label}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Image URL / Path</label>
+                <label className="text-zinc-300 font-bold block mb-1">Product Image</label>
                 <input
                   type="text"
                   required
+                  placeholder="Image URL or local path"
                   value={editingProduct.image}
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, image: e.target.value })
                   }
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white font-mono text-[11px]"
                 />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageUpload}
+                  className="mt-2 block w-full text-[11px] text-zinc-400 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-2 file:font-bold file:text-zinc-950"
+                />
+                <p className="mt-1 text-[10px] text-zinc-500">Upload an image up to 2 MB. It is saved with this menu item.</p>
+                {imageUploadError && <p className="mt-1 text-[11px] text-red-400">{imageUploadError}</p>}
               </div>
 
               <div>

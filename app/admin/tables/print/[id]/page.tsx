@@ -54,18 +54,18 @@ export default function TablePrintStandeePage({
       <div className="w-[380px] bg-white rounded-3xl p-8 border-4 border-amber-400 shadow-2xl flex flex-col items-center text-center space-y-4 print:border-2 print:shadow-none print:m-0">
         {/* Brand Header */}
         <div className="flex items-center gap-2.5">
-          <div className="w-12 h-12 bg-amber-400 rounded-full border-2 border-zinc-900 p-0.5 flex items-center justify-center">
+          <div className="w-16 h-16 bg-[#fff500] rounded-xl border-2 border-zinc-900 p-0.5 flex items-center justify-center">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Mascot"
-              width={44}
-              height={44}
-              className="object-contain"
+              alt="Student Pizza & Fastfood logo"
+              width={60}
+              height={60}
+              className="h-full w-full object-contain"
             />
           </div>
           <div className="text-left">
             <h1 className="text-xl font-black italic tracking-tight text-red-600 leading-none">
-              STUDENT <span className="text-amber-500">SHAWARMA</span>
+              STUDENT <span className="text-amber-500">PIZZA</span>
             </h1>
             <p className="text-[10px] text-zinc-700 font-bold tracking-wider uppercase">
               Pizza &amp; Fast Food • Lahore

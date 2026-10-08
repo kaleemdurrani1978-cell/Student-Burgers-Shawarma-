@@ -7,6 +7,7 @@ import { Lock, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
@@ -42,19 +43,19 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md bg-zinc-900/80 border border-zinc-800 rounded-3xl p-8 shadow-2xl space-y-6">
         {/* Brand Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-amber-400 rounded-full mx-auto p-1 flex items-center justify-center border-2 border-amber-300 shadow-md">
+          <div className="w-28 h-28 bg-[#fff500] rounded-2xl mx-auto p-1 flex items-center justify-center border border-amber-300 shadow-md">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Mascot"
-              width={56}
-              height={56}
-              className="object-contain"
+              alt="Student Pizza & Fastfood logo"
+              width={112}
+              height={112}
+              className="h-full w-full object-contain"
             />
           </div>
           <div>
             <h1 className="text-2xl font-black text-white">Owner &amp; Staff Login</h1>
             <p className="text-xs text-zinc-400 mt-1">
-              Student Shawarma • Mobile Admin Control
+              Student Pizza &amp; Fastfood • Mobile Admin Control
             </p>
           </div>
         </div>
@@ -69,11 +70,25 @@ export default function AdminLoginPage() {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-zinc-300 block mb-1.5">
+              Username
+            </label>
+            <input
+              type="text"
+              autoComplete="username"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-amber-400"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-zinc-300 block mb-1.5">
               Admin Password / Secret Key
             </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 required
                 placeholder="Enter admin password..."
                 value={password}
@@ -89,7 +104,7 @@ export default function AdminLoginPage() {
               </button>
             </div>
             <p className="text-[11px] text-zinc-500 mt-1.5">
-              Default development password: <code className="text-amber-400">student_lahore_2026</code>
+              Admin credentials are configured privately for this installation.
             </p>
           </div>
 

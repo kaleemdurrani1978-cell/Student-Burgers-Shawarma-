@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrderById, updateOrderStatus, markWhatsAppDeclaredSent } from '@/lib/db';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function GET(
   req: NextRequest,
@@ -34,6 +35,9 @@ export async function PATCH(
       }
       return NextResponse.json({ success: true, order: updated });
     }
+
+    const unauthorized = requireAdmin(req);
+    if (unauthorized) return unauthorized;
 
     if (body.status) {
       const updated = await updateOrderStatus(

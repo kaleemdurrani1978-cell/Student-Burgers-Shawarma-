@@ -46,20 +46,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="hidden md:flex flex-col w-64 bg-zinc-900 border-r border-zinc-800 p-5 shrink-0">
         {/* Brand Header */}
         <div className="flex items-center gap-3 pb-6 border-b border-zinc-800">
-          <div className="w-10 h-10 bg-amber-400 rounded-full p-0.5 flex items-center justify-center border-2 border-amber-300 shrink-0">
+          <div className="w-16 h-16 bg-[#fff500] rounded-xl p-0.5 flex items-center justify-center border border-amber-300 shrink-0">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Mascot"
-              width={36}
-              height={36}
-              className="object-contain"
+              alt="Student Pizza & Fastfood logo"
+              width={64}
+              height={64}
+              className="h-full w-full object-contain"
             />
           </div>
           <div>
             <span className="text-xs uppercase font-black text-amber-400 block leading-none">
               Control Panel
             </span>
-            <span className="text-sm font-black text-white">Student Shawarma</span>
+            <span className="text-sm font-black text-white">Student Pizza &amp; Fastfood</span>
           </div>
         </div>
 
@@ -110,13 +110,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Top Header on Mobile & Tablet */}
         <header className="h-16 bg-zinc-900 border-b border-zinc-800 px-4 flex items-center justify-between md:hidden">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-amber-400 rounded-full p-0.5 flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#fff500] rounded-lg p-0.5 flex items-center justify-center">
               <Image
                 src="/images/branding/icon-192.png"
-                alt="Mascot"
-                width={30}
-                height={30}
-                className="object-contain"
+                alt="Student Pizza & Fastfood logo"
+                width={48}
+                height={48}
+                className="h-full w-full object-contain"
               />
             </div>
             <span className="font-black text-sm text-white">Owner Portal</span>

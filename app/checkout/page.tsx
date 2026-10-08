@@ -287,7 +287,7 @@ export default function CheckoutPage() {
                   <textarea
                     required
                     rows={2}
-                    placeholder="House/Plot #, Street, Near landmark, Shalimar Link Road / Ramgarh / Lahore..."
+                    placeholder="House/Plot #, Street, Near landmark, Shalimar Link Road / Lahore..."
                     value={deliveryAddress}
                     onChange={(e) => setDeliveryAddress(e.target.value)}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
@@ -404,7 +404,7 @@ export default function CheckoutPage() {
                 <span>Verified Direct Kitchen Order</span>
               </div>
               <p>
-                No platform commissions. Your order reaches the Student Shawarma team on Shalimar Link Road directly.
+                No platform commissions. Your order reaches the Student Pizza &amp; Fastfood team on Shalimar Link Road directly.
               </p>
             </div>
           </div>

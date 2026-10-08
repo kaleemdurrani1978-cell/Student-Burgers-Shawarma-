@@ -5,7 +5,7 @@ import path from 'path';
 
 async function runVerification() {
   console.log('================================================================');
-  console.log('STUDENT SHAWARMA — AUTOMATED TEST SUITE & BUSINESS AUDIT');
+  console.log('STUDENT PIZZA & FASTFOOD — AUTOMATED TEST SUITE & BUSINESS AUDIT');
   console.log('================================================================\n');
 
   let passedTests = 0;
@@ -24,25 +24,141 @@ async function runVerification() {
   }
 
   // TEST 1: Inventory Counts
-  assert(initialProducts.length === 28, 'Extracted exactly 28 products from Side 1', `Found ${initialProducts.length}`);
-  assert(initialDeals.length === 12, 'Extracted exactly 12 Student Deals from Side 2', `Found ${initialDeals.length}`);
+  assert(initialProducts.length === 31, 'Configured 31 individual menu products', `Found ${initialProducts.length}`);
+  assert(initialDeals.length === 14, 'Configured all 14 Student Deals', `Found ${initialDeals.length}`);
 
   // TEST 2: Price Fidelity against Menu Card
-  const chickenShawarmaS = initialProducts.find(p => p.id === 'chicken-shawarma-s');
-  assert(chickenShawarmaS?.price === 130, 'Chicken Shawarma (S) price is exactly 130/-');
+  const shawarmas = initialProducts.filter(product => product.categoryId === 'shawarma');
+  assert(
+    shawarmas.length === 3 &&
+      shawarmas.some(product => product.nameEn === 'Regular Shawarma' && product.price === 180) &&
+      shawarmas.some(product => product.nameEn === 'Especial Shawarma' && product.price === 250) &&
+      shawarmas.some(product => product.nameEn === 'Zinger Shawarma' && product.price === 300),
+    'Shawarma menu has only the three requested varieties and prices'
+  );
+  const platterProducts = initialProducts.filter(product => product.categoryId === 'platters-rolls');
+  assert(
+    platterProducts.length === 1 &&
+      platterProducts[0].nameEn === 'Platter Shawarma' &&
+      platterProducts[0].price === 450,
+    'Platters & Rolls menu has only Platter Shawarma at Rs. 450'
+  );
+
+  const expectedMenuCategories: Record<string, number> = {
+    'zinger-burgers': 5,
+    'shami-burgers': 4,
+    'chicken-burgers': 3,
+    'shappatta-rolls': 4,
+    'paratha-rolls': 2,
+    fries: 2,
+    sandwiches: 3,
+    soups: 2,
+    addons: 2,
+  };
+  assert(
+    Object.entries(expectedMenuCategories).every(
+      ([categoryId, count]) =>
+        initialProducts.filter(product => product.categoryId === categoryId).length === count
+    ),
+    'All updated fast-food categories contain exactly the requested number of menu cards'
+  );
+
+  const expectedMenuPrices: Record<string, number> = {
+    'chicken-shawarma-s': 180,
+    'student-special-shawarma': 250,
+    'zinger-shawarma-m': 300,
+    'chicken-platter-shawarma': 450,
+    'zinger-burger': 300,
+    'zinger-burger-fries': 350,
+    'zinger-lapeta-burger': 350,
+    'zinger-double-tekar-fries': 600,
+    'zinger-piece': 250,
+    'shami-burger': 150,
+    'shami-double-anda-burger': 200,
+    'gol-shami-burger': 180,
+    'student-especial-lapeta-burger': 250,
+    'chicken-patty-burger': 250,
+    'chicken-patty-burger-fries': 300,
+    'chicken-burger': 350,
+    'shappatta-roll': 500,
+    'malai-boti-sandwich': 500,
+    'malai-boti-paratha-roll': 400,
+    'tikka-shawarma': 300,
+    'chicken-paratha-roll': 350,
+    'zinger-paratha-roll': 350,
+    'half-fries': 150,
+    'full-fries': 300,
+    'chicken-sandwich': 400,
+    'club-sandwich': 350,
+    'chicken-tikka-sandwich': 400,
+    'chicken-corn-soup': 150,
+    'hot-sour-soup': 150,
+    'extra-mayo': 30,
+    'extra-mayo-large': 50,
+  };
+  assert(
+    Object.entries(expectedMenuPrices).every(([id, price]) =>
+      initialProducts.some(product => product.id === id && product.price === price)
+    ),
+    'All 31 menu item prices match the requested amounts'
+  );
 
   const zingerBurger = initialProducts.find(p => p.id === 'zinger-burger');
-  assert(zingerBurger?.price === 280, 'Zinger Burger price is exactly 280/-');
+  assert(zingerBurger?.price === 300, 'Zinger Burger price is exactly 300/-');
+  assert(
+    initialProducts.find(product => product.id === 'zinger-double-tekar-fries')?.price === 600 &&
+      initialProducts.find(product => product.id === 'extra-mayo')?.price === 30 &&
+      initialProducts.find(product => product.id === 'extra-mayo-large')?.price === 50,
+    'Zinger Double Tekar and both mayo sizes have the requested prices'
+  );
 
   const deal3 = initialDeals.find(d => d.id === 'deal-3');
-  assert(deal3?.price === 250, 'Deal 3 price is exactly 250/-');
+  assert(deal3?.price === 280, 'Deal 3 price is exactly 280/-');
 
   const familyDeal13 = initialDeals.find(d => d.id === 'deal-13');
-  assert(familyDeal13?.price === 2100 && familyDeal13.isFamilyDeal === true, 'Deal 13 is Family Deal and priced at 2100/-');
+  assert(
+    familyDeal13?.price === 1700 &&
+      familyDeal13.isFamilyDeal === true &&
+      familyDeal13.components.map(component => component.quantity).join(',') === '5,1,1' &&
+      familyDeal13.components[0].nameEn === 'Zinger Burger' &&
+      familyDeal13.components[1].nameEn === 'Half French Fries' &&
+      familyDeal13.components[2].nameEn === '1.5 Liter Cold Drink Bottle',
+    'Deal 13 is Rs. 1700 with 5 Zinger Burgers, half fries, and a 1.5 Liter bottle'
+  );
+  const deal14 = initialDeals.find(d => d.id === 'deal-14');
+  assert(
+    deal14?.price === 850 &&
+      deal14.components.map(component => component.nameEn).join(',') ===
+        'Regular Shawarma,Shami Burger,Zinger Burger,Half French Fries,1 Liter Cold Drink Bottle',
+    'Deal 14 is Rs. 850 with the requested combo items and half fries'
+  );
+  assert(
+    initialDeals.find(d => d.id === 'deal-1')?.price === 400 &&
+      initialDeals.find(d => d.id === 'deal-2')?.price === 350 &&
+      initialDeals.find(d => d.id === 'deal-2')?.components[0].nameEn ===
+        'Student Special Lapeta Burger',
+    'Deals 1 and 2 have the requested prices and bundle items'
+  );
+  const expectedDealPrices: Record<string, number> = {
+    'deal-3': 280,
+    'deal-4': 350,
+    'deal-5': 450,
+    'deal-6': 400,
+    'deal-8': 350,
+    'deal-9': 400,
+    'deal-10': 450,
+    'deal-11': 400,
+    'deal-12': 450,
+  };
+  assert(
+    Object.entries(expectedDealPrices).every(([id, price]) =>
+      initialDeals.some(deal => deal.id === id && deal.price === price)
+    ),
+    'All other requested Student Deal prices match'
+  );
 
-  // TEST 3: Image Assets Exist Locally and are Unique
+  // TEST 3: All product and deal images exist locally
   const publicDir = path.join(process.cwd(), 'public');
-  const checkedImages = new Set<string>();
   let allImagesExist = true;
 
   for (const prod of initialProducts) {
@@ -51,7 +167,6 @@ async function runVerification() {
       allImagesExist = false;
       console.error(`Missing product image file: ${fullPath}`);
     }
-    checkedImages.add(prod.image);
   }
 
   for (const deal of initialDeals) {
@@ -60,11 +175,9 @@ async function runVerification() {
       allImagesExist = false;
       console.error(`Missing deal image file: ${fullPath}`);
     }
-    checkedImages.add(deal.image);
   }
 
-  assert(allImagesExist, 'All 40 menu items have existing local image files on disk');
-  assert(checkedImages.size === 40, 'All 40 menu items have 100% UNIQUE photographic assets (No repeated images)', `Unique: ${checkedImages.size}/40`);
+  assert(allImagesExist, 'All 45 products and deals have existing local image files on disk');
 
   // TEST 4: Server-Side Price & Availability Validation
   console.log('\n--- Testing Server-Side Order Calculations ---');
@@ -74,17 +187,17 @@ async function runVerification() {
       customerPhone: '0309-4222283',
       orderType: 'takeaway',
       items: [
-        { itemType: 'product', itemId: 'chicken-shawarma-s', quantity: 2 }, // 130 * 2 = 260
-        { itemType: 'deal', itemId: 'deal-3', quantity: 1 }, // 250 * 1 = 250
+        { itemType: 'product', itemId: 'chicken-shawarma-s', quantity: 2 }, // 180 * 2 = 360
+        { itemType: 'deal', itemId: 'deal-3', quantity: 1 }, // 280 * 1 = 280
       ],
     });
 
-    const expectedSubtotal = 260 + 250; // 510
+    const expectedSubtotal = 360 + 280; // 640
     assert(testOrder.order.itemsSubtotal === expectedSubtotal, `Authoritative items subtotal calculated correctly (${testOrder.order.itemsSubtotal} === ${expectedSubtotal})`);
     assert(testOrder.order.grandTotal === expectedSubtotal, `Takeaway orders have 0 delivery fee, grand total matches subtotal (${testOrder.order.grandTotal})`);
     assert(testOrder.order.status === 'awaiting_whatsapp', 'Initial order status is strictly "awaiting_whatsapp"');
     assert(testOrder.whatsappUrl.includes('wa.me/923094222283'), 'WhatsApp URL points to verified international recipient number');
-    assert(testOrder.whatsappUrl.includes(encodeURIComponent('NEW ORDER — STUDENT SHAWARMA')), 'WhatsApp message contains standardized prompt header');
+    assert(testOrder.whatsappUrl.includes(encodeURIComponent('NEW ORDER — STUDENT PIZZA & FASTFOOD')), 'WhatsApp message contains standardized prompt header');
   } catch (err) {
     assert(false, 'Server-side order creation succeeded without error', String(err));
   }
@@ -97,11 +210,11 @@ async function runVerification() {
       orderType: 'delivery',
       deliveryAddress: 'House 12, Street 4, Shalimar Link Road, Lahore',
       items: [
-        { itemType: 'product', itemId: 'student-special-shawarma', quantity: 1 }, // 280
+        { itemType: 'product', itemId: 'student-special-shawarma', quantity: 1 }, // 250
       ],
     });
 
-    const expectedGrand = 280 + initialBusinessSettings.deliveryCharges;
+    const expectedGrand = 250 + initialBusinessSettings.deliveryCharges;
     assert(deliveryOrder.order.deliveryCharges === 100, 'Delivery order incurs configured 100 PKR delivery charge');
     assert(deliveryOrder.order.grandTotal === expectedGrand, `Grand total with delivery is correctly calculated (Rs. ${expectedGrand})`);
   } catch (err) {

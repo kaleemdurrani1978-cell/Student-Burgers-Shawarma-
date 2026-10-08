@@ -51,7 +51,7 @@ export default function TableSelectionPage() {
           </div>
           <h1 className="text-3xl font-black text-white">Dine-In Table Ordering</h1>
           <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
-            Seated at a table at Student Shawarma? Select your table below or enter the table number from your table stand to start ordering directly to your seat.
+            Seated at a table at Student Pizza &amp; Fastfood? Select your table below or enter the table number from your table stand to start ordering directly to your seat.
           </p>
         </div>
 

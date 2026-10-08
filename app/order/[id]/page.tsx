@@ -144,7 +144,7 @@ export default function OrderTrackingPage({
     completed: {
       title: 'Order Completed',
       color: 'text-zinc-300 bg-zinc-800 border-zinc-700',
-      desc: 'This order has been served or delivered. Thank you for dining with Student Shawarma!',
+      desc: 'This order has been served or delivered. Thank you for dining with Student Pizza & Fastfood!',
     },
     cancelled: {
       title: 'Order Cancelled',

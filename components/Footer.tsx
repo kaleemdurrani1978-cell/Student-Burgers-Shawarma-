@@ -12,7 +12,7 @@ interface FooterProps {
 export default function Footer({
   phone = '0309-4222283',
   whatsappNumber = '923094222283',
-  address = 'Shalimar Link Road, Ramgarh, Lahore, Pakistan',
+  address = 'Shalimar Link Road, Lahore, Pakistan',
 }: FooterProps) {
   return (
     <footer className="bg-zinc-950 border-t border-zinc-800 text-zinc-400 text-sm">
@@ -21,20 +21,20 @@ export default function Footer({
           {/* Brand Info */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-amber-400 rounded-full border-2 border-amber-300 p-0.5 shadow-md flex items-center justify-center overflow-hidden shrink-0">
+              <div className="w-16 h-16 bg-[#fff500] rounded-xl border border-amber-300 p-0.5 shadow-md flex items-center justify-center shrink-0">
                 <Image
                   src="/images/branding/icon-192.png"
-                  alt="Student Shawarma Mascot"
-                  width={48}
-                  height={48}
-                  className="object-contain"
+                  alt="Student Pizza & Fastfood logo"
+                  width={64}
+                  height={64}
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div>
                 <h3 className="text-xl font-black italic text-amber-400 leading-none">
-                  <span className="text-red-500">STUDENT</span> SHAWARMA
+                  <span className="text-red-500">STUDENT PIZZA</span> &amp; FASTFOOD
                 </h3>
-                <p className="text-xs text-zinc-400 font-urdu mt-0.5">سٹوڈنٹ شوارما اینڈ فاسٹ فوڈ</p>
+                <p className="text-xs text-zinc-400 font-urdu mt-0.5">سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ</p>
               </div>
             </div>
             <p className="text-xs leading-relaxed text-zinc-400">
@@ -43,9 +43,6 @@ export default function Footer({
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-bold text-amber-400 bg-amber-950/60 border border-amber-600/40 px-2 py-0.5 rounded-full">
                 Authentic Menu 2026
-              </span>
-              <span className="text-[11px] font-bold text-red-400 bg-red-950/60 border border-red-600/40 px-2 py-0.5 rounded-full">
-                Sunday Off
               </span>
             </div>
           </div>
@@ -58,32 +55,32 @@ export default function Footer({
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/menu?category=shawarma" className="hover:text-amber-400 transition-colors">
-                  🍗 Chicken &amp; Zinger Shawarma
+                  🌯 Shawarma
                 </Link>
               </li>
               <li>
                 <Link href="/menu?category=deals" className="text-amber-400 hover:underline font-semibold">
-                  🔥 Student Deals (Deals 3 to 14)
+                  🔥 Student Deals (Deals 1 to 14)
                 </Link>
               </li>
               <li>
-                <Link href="/menu?category=burgers" className="hover:text-amber-400 transition-colors">
-                  🍔 Zinger, Tikka &amp; Shami Burgers
+                <Link href="/menu?category=zinger-burgers" className="hover:text-amber-400 transition-colors">
+                  🍔 Zinger Burgers
                 </Link>
               </li>
               <li>
                 <Link href="/menu?category=platters-rolls" className="hover:text-amber-400 transition-colors">
-                  🥙 Platters &amp; Paratha Rolls
+                  🥙 Platters &amp; Rolls
                 </Link>
               </li>
               <li>
-                <Link href="/menu?category=chicken-snacks" className="hover:text-amber-400 transition-colors">
-                  🍗 Crispy Wings &amp; Drumsticks
+                <Link href="/menu?category=shami-burgers" className="hover:text-amber-400 transition-colors">
+                  🍔 Shami Burgers
                 </Link>
               </li>
               <li>
                 <Link href="/menu?category=sandwiches" className="hover:text-amber-400 transition-colors">
-                  🥪 Club &amp; Tikka Sandwiches
+                  🥪 Sandwiches
                 </Link>
               </li>
             </ul>
@@ -113,8 +110,7 @@ export default function Footer({
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-zinc-300">Mon – Sat: 1:00 PM – 1:00 AM</p>
-                  <p className="text-red-400 font-bold">Sunday: Closed (Sunday Off)</p>
+                  <p className="font-semibold text-zinc-300">Hours will be updated soon</p>
                 </div>
               </div>
             </div>
@@ -137,7 +133,7 @@ export default function Footer({
                 <span>Owner Admin Portal</span>
               </Link>
               <a
-                href="https://www.facebook.com/p/Student-pizza-Fastfood-100089295146903/"
+                href="https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-blue-950/40 hover:bg-blue-900/60 text-blue-300 border border-blue-900/60 px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors w-full justify-center"
@@ -151,11 +147,11 @@ export default function Footer({
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
-          <p>© {new Date().getFullYear()} Student Shawarma &amp; Fast Food. All prices in PKR (Rs.).</p>
+          <p>© {new Date().getFullYear()} Student Pizza &amp; Fastfood. All prices in PKR (Rs.).</p>
           <div className="flex items-center gap-1 text-zinc-400">
             <span>Crafted with</span>
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" />
-            <span>for Student Shawarma Lahore</span>
+            <span>for Student Pizza &amp; Fastfood Lahore</span>
           </div>
         </div>
       </div>

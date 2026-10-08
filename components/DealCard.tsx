@@ -82,14 +82,18 @@ export default function DealCard({ deal }: DealCardProps) {
           <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 my-3">
             <div className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider mb-2 flex items-center justify-between">
               <span>What&apos;s Included</span>
-              <span className="text-amber-400 font-mono">{deal.components.length} Items</span>
+              <span className="text-amber-400 font-mono">
+                {deal.components.reduce((total, component) => total + component.quantity, 0)} Items
+              </span>
             </div>
             <ul className="space-y-1.5 text-xs text-zinc-300">
               {deal.components.map((comp, idx) => (
                 <li key={idx} className="flex items-center justify-between gap-2 border-b border-zinc-800/40 pb-1 last:border-none last:pb-0">
                   <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                    <span>{comp.nameEn}</span>
+                    <span>
+                      {comp.quantity} × {comp.nameEn.replace(/^\d+\s+/, '')}
+                    </span>
                   </span>
                   <span className="text-[11px] text-zinc-400 font-urdu">{comp.nameUr}</span>
                 </li>

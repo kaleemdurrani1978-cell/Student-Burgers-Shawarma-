@@ -121,13 +121,23 @@ export default function AdminTablesPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setNewTableModal(true)}
-          className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all cursor-pointer w-fit"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Table</span>
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/qr/print-tables"
+            target="_blank"
+            className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all w-fit"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print Tables 1–6</span>
+          </Link>
+          <button
+            onClick={() => setNewTableModal(true)}
+            className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all cursor-pointer w-fit"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Table</span>
+          </button>
+        </div>
       </div>
 
       {/* Grid of Tables */}

@@ -2,16 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Flame,
   ArrowRight,
-  Clock,
-  MapPin,
   Phone,
   ShieldCheck,
   CheckCircle2,
   Utensils,
   Bike,
-  Sparkles,
   QrCode,
 } from 'lucide-react';
 import { getProducts, getDeals, getBusinessSettings } from '@/lib/db';
@@ -25,15 +21,9 @@ export default async function HomePage() {
     getBusinessSettings(),
   ]);
 
-  // Determine current day of week and open status
-  const now = new Date();
-  const day = now.getDay(); // 0 is Sunday
-  const isSunday = day === 0;
-  const isOpen = !isSunday; // Mon-Sat open
-
   // Select top featured items from real verified list
   const popularShawarma = products.filter((p) => p.isFeatured && p.categoryId === 'shawarma').slice(0, 4);
-  const popularBurgers = products.filter((p) => p.categoryId === 'burgers').slice(0, 3);
+  const popularBurgers = products.filter((p) => p.categoryId === 'zinger-burgers').slice(0, 3);
   const featuredDeals = deals.slice(0, 4); // Top 4 deals including Deal 3, 4, 13, 14
 
   return (
@@ -60,14 +50,8 @@ export default async function HomePage() {
             <div className="lg:col-span-7 flex flex-col gap-6 text-left">
               {/* Status Badge */}
               <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full w-fit">
-                <span
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    isOpen ? 'bg-emerald-500 animate-ping' : 'bg-red-500'
-                  }`}
-                />
-                <span className="text-xs font-bold text-zinc-300">
-                  {isOpen ? 'Open Now (1:00 PM – 1:00 AM)' : 'Closed Today (Sunday Off)'}
-                </span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-bold text-zinc-300">Dine-In, Takeaway &amp; Delivery</span>
                 <span className="text-zinc-600">|</span>
                 <span className="text-xs font-semibold text-amber-400">Shalimar Link Rd, Lahore</span>
               </div>
@@ -79,7 +63,7 @@ export default async function HomePage() {
                     Original Lahore Brand
                   </span>
                   <span className="text-xs text-amber-400 font-urdu font-bold">
-                    سٹوڈنٹ شوارما اینڈ فاسٹ فوڈ
+                    سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ
                   </span>
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black italic tracking-tight text-white leading-[1.05]">
@@ -151,8 +135,8 @@ export default async function HomePage() {
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md aspect-square rounded-3xl overflow-hidden border-4 border-amber-500/40 shadow-2xl shadow-amber-500/10 bg-zinc-900">
                 <Image
-                  src="/images/hero/hero-food-banner.webp"
-                  alt="Student Shawarma Feast"
+                  src="/images/hero/hero-shawarma.webp"
+                  alt="Fresh chicken shawarma with vegetables and fries"
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   priority
@@ -162,20 +146,20 @@ export default async function HomePage() {
 
                 {/* Floating Mascot Badge */}
                 <div className="absolute top-4 right-4 bg-zinc-950/90 border border-amber-400 rounded-2xl p-2.5 flex items-center gap-2.5 shadow-xl backdrop-blur-md">
-                  <div className="w-10 h-10 rounded-full bg-amber-400 p-0.5 overflow-hidden flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-lg bg-[#fff500] p-0.5 flex items-center justify-center shrink-0">
                     <Image
                       src="/images/branding/icon-192.png"
-                      alt="Student Mascot"
-                      width={40}
-                      height={40}
-                      className="object-contain"
+                      alt="Student Pizza & Fastfood logo"
+                      width={56}
+                      height={56}
+                      className="h-full w-full object-contain"
                     />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase font-black text-amber-400 block leading-none">
                       Student Special
                     </span>
-                    <span className="text-xs font-black text-white">Deal Starting Rs. 250</span>
+                    <span className="text-xs font-black text-white">Deals Starting Rs. 250</span>
                   </div>
                 </div>
 
@@ -210,17 +194,23 @@ export default async function HomePage() {
               Browse Categories
             </h2>
             <Link href="/menu" className="text-xs font-bold text-amber-400 hover:underline">
-              See All 28 Items →
+              See All 45 Items →
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {[
-              { id: 'deals', name: 'Student Deals', count: '12 Deals', icon: '🔥', highlight: true },
-              { id: 'shawarma', name: 'Shawarma', count: '8 Varieties', icon: '🌯' },
-              { id: 'platters-rolls', name: 'Platters & Rolls', count: '4 Items', icon: '🥙' },
-              { id: 'burgers', name: 'Burgers', count: '5 Varieties', icon: '🍔' },
-              { id: 'chicken-snacks', name: 'Wings & Snacks', count: '4 Items', icon: '🍗' },
-              { id: 'sandwiches', name: 'Sandwiches', count: '4 Items', icon: '🥪' },
+              { id: 'deals', name: 'Student Deals', count: '14 Deals', icon: '🔥', highlight: true },
+              { id: 'shawarma', name: 'Shawarma', count: '3 Items', icon: '🌯' },
+              { id: 'platters-rolls', name: 'Platters & Rolls', count: '1 Item', icon: '🥙' },
+              { id: 'zinger-burgers', name: 'Zinger Burgers', count: '5 Items', icon: '🍔' },
+              { id: 'shami-burgers', name: 'Shami Burgers', count: '4 Items', icon: '🍔' },
+              { id: 'chicken-burgers', name: 'Chicken Burgers', count: '3 Items', icon: '🍔' },
+              { id: 'shappatta-rolls', name: 'Shappatta Roll', count: '4 Items', icon: '🥙' },
+              { id: 'paratha-rolls', name: 'Paratha Rolls', count: '2 Items', icon: '🌯' },
+              { id: 'fries', name: 'Fries', count: '2 Items', icon: '🍟' },
+              { id: 'sandwiches', name: 'Sandwiches', count: '3 Items', icon: '🥪' },
+              { id: 'soups', name: 'Soup', count: '2 Items', icon: '🍲' },
+              { id: 'addons', name: 'Extras & Add-ons', count: '2 Items', icon: '➕' },
             ].map((cat) => (
               <Link
                 key={cat.id}
@@ -264,7 +254,7 @@ export default async function HomePage() {
               href="/menu?category=deals"
               className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-bold text-sm bg-zinc-900 px-4 py-2.5 rounded-xl border border-zinc-800 hover:border-amber-500/50 w-fit"
             >
-              <span>View All 12 Student Deals</span>
+              <span>View All 14 Student Deals</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -299,7 +289,7 @@ export default async function HomePage() {
               href="/menu?category=shawarma"
               className="text-amber-400 hover:underline font-bold text-sm"
             >
-              Explore all 8 Shawarmas →
+              Explore all 3 Shawarmas →
             </Link>
           </div>
 
@@ -323,11 +313,11 @@ export default async function HomePage() {
                 <span className="text-xs text-amber-400 font-urdu font-bold">برگر</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-black text-white">
-                Crispy Zinger &amp; <span className="text-red-500">Shami Burgers</span>
+                Crispy <span className="text-red-500">Zinger Burgers</span>
               </h2>
             </div>
             <Link
-              href="/menu?category=burgers"
+              href="/menu?category=zinger-burgers"
               className="text-amber-400 hover:underline font-bold text-sm"
             >
               View all burgers →
@@ -357,7 +347,7 @@ export default async function HomePage() {
                   <span className="text-amber-400">Scan Your Table QR Code to Order</span>
                 </h3>
                 <p className="text-sm text-zinc-400 max-w-xl leading-relaxed">
-                  Every dining table at Student Shawarma features a unique QR standee. Scan with your
+                  Every dining table at Student Pizza &amp; Fastfood features a unique QR standee. Scan with your
                   smartphone camera to load the live menu with your table number pre-selected, order directly,
                   and relax while our kitchen prepares your meal.
                 </p>
@@ -384,7 +374,7 @@ export default async function HomePage() {
                     T01
                   </div>
                   <h4 className="font-black text-base">Table 01 QR</h4>
-                  <p className="text-[11px] text-zinc-600 mb-3">Student Shawarma Lahore</p>
+                  <p className="text-[11px] text-zinc-600 mb-3">Student Pizza &amp; Fastfood Lahore</p>
                   <div className="aspect-square bg-zinc-100 rounded-xl p-2 border border-zinc-200 flex items-center justify-center">
                     <QrCode className="w-32 h-32 text-zinc-900" />
                   </div>
@@ -420,7 +410,6 @@ export default async function HomePage() {
               <div className="space-y-1">
                 <p className="text-zinc-500 uppercase font-black text-[10px]">Operating Hours</p>
                 <p className="text-zinc-200 font-semibold">{settings.openingHoursFormatted}</p>
-                <p className="text-red-400 font-bold">Strictly Closed on Sundays (Sunday Off)</p>
               </div>
             </div>
           </div>

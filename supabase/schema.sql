@@ -1,5 +1,5 @@
 -- =========================================================================
--- STUDENT SHAWARMA & FAST FOOD — PRODUCTION SUPABASE / POSTGRES SCHEMA
+-- STUDENT PIZZA & FASTFOOD — PRODUCTION SUPABASE / POSTGRES SCHEMA
 -- Location: Shalimar Link Road, Lahore
 -- =========================================================================
 

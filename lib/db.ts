@@ -20,6 +20,7 @@ import {
 } from './initialData';
 
 interface DatabaseSchema {
+  dealMenuVersion?: number;
   products: Product[];
   deals: Deal[];
   categories: Category[];
@@ -54,8 +55,131 @@ function loadDatabase(): DatabaseSchema {
   try {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
-      memoryCache = JSON.parse(raw);
-      return memoryCache!;
+      const database: DatabaseSchema = JSON.parse(raw);
+      memoryCache = database;
+      if ((database.dealMenuVersion ?? 0) < 3) {
+        const updatedDealIds = new Set([
+          'deal-1',
+          'deal-2',
+          'deal-3',
+          'deal-4',
+          'deal-5',
+          'deal-6',
+          'deal-8',
+          'deal-9',
+          'deal-10',
+          'deal-11',
+          'deal-12',
+          'deal-13',
+          'deal-14',
+        ]);
+        const savedDeals = new Map(database.deals.map((deal) => [deal.id, deal]));
+        for (const deal of initialDeals) {
+          if (updatedDealIds.has(deal.id)) {
+            const savedDeal = savedDeals.get(deal.id);
+            savedDeals.set(
+              deal.id,
+              savedDeal
+                ? {
+                    ...savedDeal,
+                    price: deal.price,
+                    originalPriceFormat: deal.originalPriceFormat,
+                    descriptionEn: deal.descriptionEn,
+                    components: deal.components,
+                    isFamilyDeal: deal.isFamilyDeal,
+                  }
+                : deal
+            );
+          }
+        }
+        database.deals = [...savedDeals.values()].sort(
+          (a, b) => a.dealNumber - b.dealNumber
+        );
+        database.dealMenuVersion = 3;
+        persistDatabase(database);
+      }
+      if ((database.dealMenuVersion ?? 0) < 4) {
+        const shawarmaProducts = new Map(
+          initialProducts
+            .filter((product) => product.categoryId === 'shawarma')
+            .map((product) => [product.id, product])
+        );
+        const existingShawarmaIds = new Set<string>();
+        database.products = database.products.flatMap((product) => {
+          const updatedProduct = shawarmaProducts.get(product.id);
+          if (product.categoryId === 'shawarma' && !updatedProduct) {
+            return [];
+          }
+          if (!updatedProduct) {
+            return [product];
+          }
+          existingShawarmaIds.add(product.id);
+          return [{ ...product, ...updatedProduct }];
+        });
+        for (const [id, product] of shawarmaProducts) {
+          if (!existingShawarmaIds.has(id)) {
+            database.products.push(product);
+          }
+        }
+        database.dealMenuVersion = 4;
+        persistDatabase(database);
+      }
+      if ((database.dealMenuVersion ?? 0) < 5) {
+        const platterProducts = new Map(
+          initialProducts
+            .filter((product) => product.categoryId === 'platters-rolls')
+            .map((product) => [product.id, product])
+        );
+        const existingPlatterIds = new Set<string>();
+        database.products = database.products.flatMap((product) => {
+          const updatedProduct = platterProducts.get(product.id);
+          if (product.categoryId === 'platters-rolls' && !updatedProduct) {
+            return [];
+          }
+          if (!updatedProduct) {
+            return [product];
+          }
+          existingPlatterIds.add(product.id);
+          return [{ ...product, ...updatedProduct }];
+        });
+        for (const [id, product] of platterProducts) {
+          if (!existingPlatterIds.has(id)) {
+            database.products.push(product);
+          }
+        }
+        database.dealMenuVersion = 5;
+        persistDatabase(database);
+      }
+      if ((database.dealMenuVersion ?? 0) < 6) {
+        const savedProducts = new Map(database.products.map((product) => [product.id, product]));
+        database.products = initialProducts.map((product) => {
+          const savedProduct = savedProducts.get(product.id);
+          return savedProduct
+            ? {
+                ...product,
+                image: savedProduct.image,
+                isAvailable: savedProduct.isAvailable,
+              }
+            : product;
+        });
+        database.categories = [...initialCategories];
+        database.settings = {
+          ...database.settings,
+          address: initialBusinessSettings.address,
+          facebookUrl: initialBusinessSettings.facebookUrl,
+          openingHoursFormatted: initialBusinessSettings.openingHoursFormatted,
+          isSundayOff: false,
+          announcementText: initialBusinessSettings.announcementText,
+        };
+        database.dealMenuVersion = 6;
+        persistDatabase(database);
+      }
+      if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
+        database.settings.restaurantName = initialBusinessSettings.restaurantName;
+        database.settings.urduName = initialBusinessSettings.urduName;
+        persistDatabase(database);
+      }
+      return database;
     }
   } catch (err) {
     console.warn('Could not read persistent DB file, seeding fresh defaults:', err);
@@ -63,6 +187,7 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
+    dealMenuVersion: 6,
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],
@@ -392,7 +517,7 @@ export async function serverValidateAndCreateOrder(payload: {
 
   // Build the standardized WhatsApp message required by prompt
   let messageLines: string[] = [
-    `*NEW ORDER — STUDENT SHAWARMA*`,
+    `*NEW ORDER — STUDENT PIZZA & FASTFOOD*`,
     `Order ID: ${orderId}`,
     `Order Type: ${orderTypeDisplay}`,
     `Customer Name: ${payload.customerName.trim()}`,

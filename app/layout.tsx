@@ -7,37 +7,37 @@ import CartDrawer from '@/components/CartDrawer';
 import TableParamDetector from '@/components/TableParamDetector';
 
 export const metadata: Metadata = {
-  title: 'Student Shawarma & Fast Food | Authentic Shawarma, Burgers & Deals (Lahore)',
+  title: 'Student Pizza & Fastfood | Shawarma, Burgers & Deals (Lahore)',
   description:
     'Authentic chicken shawarma, zinger burgers, platters, paratha rolls, and budget student deals in Shalimar Link Road, Lahore. Order direct on WhatsApp or Dine-In with QR.',
   keywords: [
-    'Student Shawarma',
-    'Student Shawarma Lahore',
-    'Student Pizza Fastfood',
+    'Student Pizza & Fastfood',
+    'Student Pizza & Fastfood Lahore',
+    'Student Pizza Fastfood Lahore',
     'Shalimar Link Road Lahore food',
     'Zinger burger Lahore',
     'Shawarma delivery Lahore',
     'Student Deals fast food',
   ],
-  authors: [{ name: 'Student Shawarma' }],
-  creator: 'Student Shawarma',
-  publisher: 'Student Shawarma',
+  authors: [{ name: 'Student Pizza & Fastfood' }],
+  creator: 'Student Pizza & Fastfood',
+  publisher: 'Student Pizza & Fastfood',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Student Shawarma | Shalimar Link Road, Lahore',
+    title: 'Student Pizza & Fastfood | Shalimar Link Road, Lahore',
     description:
       'Craving fresh, spicy chicken shawarma and crispy zinger burgers? View our verified menu and order directly via WhatsApp or scan table QR to dine in!',
     url: '/',
-    siteName: 'Student Shawarma',
+    siteName: 'Student Pizza & Fastfood',
     images: [
       {
-        url: '/images/hero/hero-food-banner.webp',
+        url: '/images/hero/hero-shawarma.webp',
         width: 1200,
         height: 630,
-        alt: 'Student Shawarma Fast Food Feast',
+        alt: 'Fresh chicken shawarma',
       },
     ],
     locale: 'en_PK',
@@ -66,13 +66,13 @@ export default function RootLayout({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FastFoodRestaurant',
-    name: 'Student Shawarma & Fast Food',
+    name: 'Student Pizza & Fastfood',
     image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5',
     telephone: '+923094222283',
     servesCuisine: ['Fast Food', 'Pakistani', 'Shawarma', 'Burgers'],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Shalimar Link Road, Ramgarh',
+      streetAddress: 'Shalimar Link Road',
       addressLocality: 'Lahore',
       addressRegion: 'Punjab',
       postalCode: '54000',
@@ -83,15 +83,8 @@ export default function RootLayout({
       latitude: '31.5796',
       longitude: '74.3792',
     },
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        opens: '13:00',
-        closes: '01:00',
-      },
-    ],
-    priceRange: 'PKR 120 - PKR 2100',
+    priceRange: 'PKR 150 - PKR 1700',
+    sameAs: ['https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/'],
   };
 
   return (

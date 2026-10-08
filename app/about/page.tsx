@@ -23,7 +23,7 @@ export default function AboutPage() {
             <span>Verified Restaurant Information • Lahore, Pakistan</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black italic tracking-tight text-white">
-            ABOUT <span className="text-amber-400">STUDENT SHAWARMA</span>
+            ABOUT <span className="text-amber-400">STUDENT PIZZA &amp; FASTFOOD</span>
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto">
             Serving the people of Lahore delicious, high-quality fast food, authentic chicken shawarmas, crispy burgers, and pocket-friendly Student Deals.
@@ -36,7 +36,7 @@ export default function AboutPage() {
             <div className="relative w-48 h-48 bg-amber-400 rounded-3xl p-3 border-4 border-amber-300 shadow-2xl flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/branding/icon-512.png"
-                alt="Student Shawarma Mascot"
+                alt="Student Pizza & Fastfood logo"
                 fill
                 sizes="192px"
                 className="object-contain p-2"
@@ -50,21 +50,21 @@ export default function AboutPage() {
                 Established Lahore
               </span>
               <span className="text-sm font-urdu font-bold text-amber-400">
-                سٹوڈنٹ شوارما اینڈ فاسٹ فوڈ
+                سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ
               </span>
             </div>
             <h2 className="text-2xl font-black text-white">
               Authentic Fast-Food Heritage
             </h2>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Student Shawarma (also known as Student Pizza &amp; Fastfood) is an independent local Pakistani fast-food brand situated on Shalimar Link Road in Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast food enthusiasts across the area.
+              Student Pizza &amp; Fastfood is an independent local Pakistani fast-food restaurant situated on Shalimar Link Road in Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast-food enthusiasts across the area.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-300 font-semibold">
-                ✓ 28 Menu Items
+                ✓ 31 Menu Items
               </span>
               <span className="bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-300 font-semibold">
-                ✓ 12 Student Deals
+                ✓ 14 Student Deals
               </span>
               <span className="bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-300 font-semibold">
                 ✓ Dine-In, Takeaway &amp; Delivery
@@ -84,7 +84,7 @@ export default function AboutPage() {
             <div className="space-y-3 text-xs text-zinc-300">
               <p>
                 <strong className="text-white block mb-0.5">Physical Address:</strong>
-                Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan
+                Shalimar Link Road, Lahore, Punjab, Pakistan
               </p>
               <p>
                 <strong className="text-white block mb-0.5">Service Radius:</strong>
@@ -113,10 +113,7 @@ export default function AboutPage() {
             <div className="space-y-3 text-xs text-zinc-300">
               <div>
                 <strong className="text-white block mb-0.5">Opening Hours:</strong>
-                <p>Monday – Saturday: 1:00 PM – 1:00 AM</p>
-                <p className="text-red-400 font-bold mt-1">
-                  Sunday: Closed (SUNDAY OFF per printed menu)
-                </p>
+                <p>Hours will be updated soon</p>
               </div>
               <div>
                 <strong className="text-white block mb-0.5">Direct Orders &amp; WhatsApp:</strong>
@@ -133,7 +130,7 @@ export default function AboutPage() {
                   <span>Message on WhatsApp</span>
                 </a>
                 <a
-                  href="https://www.facebook.com/p/Student-pizza-Fastfood-100089295146903/"
+                  href="https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 bg-blue-950/60 border border-blue-800 text-blue-300 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-900/60 transition-colors"
@@ -153,7 +150,7 @@ export default function AboutPage() {
             <span>Printed Menu Authenticity Guarantee</span>
           </div>
           <p className="leading-relaxed">
-            Every product name, Urdu label, deal bundle composition, and PKR price published on this application is directly extracted from Student Shawarma&apos;s authoritative printed menus (Sides 1 &amp; 2). All orders are validated server-side to guarantee that customer pricing matches the current restaurant menu.
+            Every product name, Urdu label, deal bundle composition, and PKR price published on this application is directly extracted from Student Pizza &amp; Fastfood&apos;s printed menus (Sides 1 &amp; 2). All orders are validated server-side to guarantee that customer pricing matches the current restaurant menu.
           </p>
         </div>
       </div>

@@ -75,7 +75,7 @@ export default function AdminDealsPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">Student Deals Management</h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Manage bundle components, prices in PKR, and availability of Deals 3 through 14.
+            Manage bundle components, prices in PKR, and availability of Deals 1 through 14.
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export default function AdminDealsPage() {
                     </span>
                     {deal.components.map((c, i) => (
                       <div key={i} className="flex justify-between text-[11px]">
-                        <span>• {c.nameEn}</span>
+                        <span>• {c.quantity} × {c.nameEn.replace(/^\d+\s+/, '')}</span>
                         <span className="text-zinc-500 font-urdu">{c.nameUr}</span>
                       </div>
                     ))}

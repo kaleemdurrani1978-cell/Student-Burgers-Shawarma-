@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, Flame, Utensils, Sandwich, Layers, Drumstick, PlusCircle, CheckCircle, Sparkles } from 'lucide-react';
+import { Search, Flame, Utensils, Sandwich, Layers, PlusCircle, CheckCircle, Sparkles } from 'lucide-react';
 import { Product, Deal, Category } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import DealCard from '@/components/DealCard';
@@ -52,13 +52,18 @@ function MenuContent() {
 
   const categoryList = [
     { id: 'all', nameEn: 'All Items', nameUr: 'تمام آئٹمز', icon: Sparkles },
-    { id: 'deals', nameEn: 'Student Deals (12)', nameUr: 'سٹوڈنٹ ڈیلز', icon: Flame, isDeal: true },
-    { id: 'shawarma', nameEn: 'Shawarma (8)', nameUr: 'شوارما', icon: Utensils },
-    { id: 'platters-rolls', nameEn: 'Platters & Rolls (4)', nameUr: 'پلیٹر اور پراٹھا', icon: Utensils },
-    { id: 'burgers', nameEn: 'Burgers (5)', nameUr: 'برگر', icon: Sandwich },
-    { id: 'chicken-snacks', nameEn: 'Chicken & Wings (4)', nameUr: 'چکن اور ونگز', icon: Drumstick },
-    { id: 'sandwiches', nameEn: 'Sandwiches (4)', nameUr: 'سینڈوچ', icon: Layers },
-    { id: 'addons', nameEn: 'Extras & Add-ons', nameUr: 'ایکسٹرا', icon: PlusCircle },
+    { id: 'deals', nameEn: 'Student Deals (14)', nameUr: 'سٹوڈنٹ ڈیلز', icon: Flame, isDeal: true },
+    { id: 'shawarma', nameEn: 'Shawarma (3)', nameUr: 'شوارما', icon: Utensils },
+    { id: 'platters-rolls', nameEn: 'Platters & Rolls (1)', nameUr: 'پلیٹر اور رول', icon: Utensils },
+    { id: 'zinger-burgers', nameEn: 'Zinger Burgers (5)', nameUr: 'زنگر برگر', icon: Sandwich },
+    { id: 'shami-burgers', nameEn: 'Shami Burgers (4)', nameUr: 'شامی برگر', icon: Sandwich },
+    { id: 'chicken-burgers', nameEn: 'Chicken Burgers (3)', nameUr: 'چکن برگر', icon: Sandwich },
+    { id: 'shappatta-rolls', nameEn: 'Shappatta Roll (4)', nameUr: 'شپٹہ رول', icon: Utensils },
+    { id: 'paratha-rolls', nameEn: 'Paratha Rolls (2)', nameUr: 'پراٹھا رول', icon: Utensils },
+    { id: 'fries', nameEn: 'Fries (2)', nameUr: 'فرائز', icon: Utensils },
+    { id: 'sandwiches', nameEn: 'Sandwiches (3)', nameUr: 'سینڈوچ', icon: Layers },
+    { id: 'soups', nameEn: 'Soup (2)', nameUr: 'سوپ', icon: Utensils },
+    { id: 'addons', nameEn: 'Extras & Add-ons (2)', nameUr: 'ایکسٹرا', icon: PlusCircle },
   ];
 
   // Filtered Deals
@@ -105,11 +110,11 @@ function MenuContent() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-black italic tracking-tight text-white">
-            EXPLORE THE <span className="text-amber-400">STUDENT SHAWARMA</span> MENU
+            EXPLORE THE <span className="text-amber-400">STUDENT PIZZA &amp; FASTFOOD</span> MENU
           </h1>
           <p className="text-xs md:text-sm text-zinc-400 max-w-xl mx-auto">
-            Choose from authentic shawarmas, crispy burgers, platters, and 12 value-packed Student Deals.
-            Customize with extra cheese, mayo, or bread.
+            Choose from authentic shawarmas, crispy burgers, platters, and 14 value-packed Student Deals.
+            Browse 31 updated menu items and 14 Student Deals.
           </p>
 
           {/* Search Bar */}
@@ -179,7 +184,7 @@ function MenuContent() {
                       <h2 className="text-2xl font-black text-white">Student Deals</h2>
                     </div>
                     <p className="text-xs text-zinc-400 mt-1">
-                      Complete meal bundles with fries &amp; drinks • Deals 3 through 14
+                      Complete meal bundles with fries &amp; drinks • Deals 1 through 14
                     </p>
                   </div>
                   <span className="text-xs text-amber-400 font-bold bg-amber-950/60 border border-amber-500/30 px-2.5 py-1 rounded-full">

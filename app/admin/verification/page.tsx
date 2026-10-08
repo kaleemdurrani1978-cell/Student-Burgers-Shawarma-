@@ -37,12 +37,12 @@ export default function MenuVerificationPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">
-              Authoritative Menu Audit
+              Owner-Provided Menu
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">Menu Verification Checklist</h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Side-by-side verification comparing database records with the restaurant&apos;s printed menu photographs.
+            Current product names, categories, images, and prices saved in the menu database.
           </p>
         </div>
 
@@ -59,17 +59,17 @@ export default function MenuVerificationPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
           <span className="text-xs text-zinc-400 font-bold block mb-1">Main Menu (Side 1)</span>
-          <span className="text-3xl font-black text-amber-400">28 Items</span>
+          <span className="text-3xl font-black text-amber-400">31 Items</span>
           <p className="text-[11px] text-zinc-500 mt-1">
-            Shawarmas, Burgers, Platters, Wings, Sandwiches &amp; Extras
+            Shawarmas, burgers, rolls, fries, sandwiches, soup &amp; extras
           </p>
         </div>
 
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
           <span className="text-xs text-zinc-400 font-bold block mb-1">Student Deals (Side 2)</span>
-          <span className="text-3xl font-black text-amber-400">12 Deals</span>
+          <span className="text-3xl font-black text-amber-400">14 Deals</span>
           <p className="text-[11px] text-zinc-500 mt-1">
-            Deals 3 to 14 (Includes Deal 13 Family Mega Feast)
+            Deals 1 to 14 (Includes Deal 13 Family Mega Feast)
           </p>
         </div>
 
@@ -78,9 +78,9 @@ export default function MenuVerificationPage() {
             <CheckCircle2 className="w-4 h-4" />
             <span>Fidelity Status</span>
           </div>
-          <span className="text-2xl font-black text-white">100% Extracted</span>
+          <span className="text-2xl font-black text-white">Menu Updated</span>
           <p className="text-[11px] text-emerald-300/80 mt-1">
-            PKR prices exactly match printed cards
+            Owner-provided menu and PKR prices
           </p>
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function MenuVerificationPage() {
       {/* Main Menu Verification Table */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl overflow-hidden shadow-xl space-y-4 p-6">
         <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h2 className="text-base font-bold text-white">Side 1: Individual Menu Products (28 Items)</h2>
+          <h2 className="text-base font-bold text-white">Individual Menu Products (31 Items)</h2>
           <span className="text-xs text-amber-400 font-bold">Main Menu Card</span>
         </div>
 
@@ -134,7 +134,7 @@ export default function MenuVerificationPage() {
       {/* Student Deals Verification Table */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl overflow-hidden shadow-xl space-y-4 p-6">
         <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h2 className="text-base font-bold text-white">Side 2: Student Deals (12 Bundles)</h2>
+          <h2 className="text-base font-bold text-white">Side 2: Student Deals (14 Bundles)</h2>
           <span className="text-xs text-amber-400 font-bold">Deals Card</span>
         </div>
 
