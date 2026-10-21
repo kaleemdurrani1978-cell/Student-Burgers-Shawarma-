@@ -135,8 +135,8 @@ export default async function HomePage() {
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md aspect-square rounded-3xl overflow-hidden border-4 border-amber-500/40 shadow-2xl shadow-amber-500/10 bg-zinc-900">
                 <Image
-                  src="/images/hero/hero-shawarma.webp"
-                  alt="Fresh chicken shawarma with vegetables and fries"
+                  src="/images/products/chicken-shawarma-s.webp"
+                  alt="Student Pizza & Fastfood regular chicken shawarma"
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   priority

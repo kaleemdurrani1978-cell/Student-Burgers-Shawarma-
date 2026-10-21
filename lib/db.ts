@@ -183,6 +183,22 @@ function loadDatabase(): DatabaseSchema {
         database.dealMenuVersion = 7;
         persistDatabase(database);
       }
+      if ((database.dealMenuVersion ?? 0) < 8) {
+        const productImages = new Map(
+          initialProducts.map((product) => [product.id, product.image])
+        );
+        const dealImages = new Map(initialDeals.map((deal) => [deal.id, deal.image]));
+        database.products = database.products.map((product) => {
+          const image = productImages.get(product.id);
+          return image ? { ...product, image } : product;
+        });
+        database.deals = database.deals.map((deal) => {
+          const image = dealImages.get(deal.id);
+          return image ? { ...deal, image } : deal;
+        });
+        database.dealMenuVersion = 8;
+        persistDatabase(database);
+      }
       if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
         database.settings.restaurantName = initialBusinessSettings.restaurantName;
         database.settings.urduName = initialBusinessSettings.urduName;
@@ -196,7 +212,7 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
-    dealMenuVersion: 7,
+    dealMenuVersion: 8,
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],

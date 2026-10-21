@@ -69,7 +69,7 @@ Every readable item, price in PKR, and deal bundle was extracted directly from t
 ## 📸 Food Photography
 
 In accordance with Section 4 of the specification:
-* The 31 menu products and 14 deals use local food photography in `/public/images/`; admin can upload a replacement JPG, PNG, or WebP image up to 4 MB per item.
+* All 31 products and 14 deals ship with optimized, version-controlled WebP photos in `/public/images/`, so the same updated images appear on the homepage, menu, deals, cart, and order pages on every installation. Admin can upload a replacement JPG, PNG, or WebP image up to 4 MB per item.
 * Automated checks (`scripts/verify-all.ts`) verify every product and deal image exists on disk.
 
 ---
