@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, startTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Flame, Utensils, Sandwich, Layers, PlusCircle, CheckCircle, Sparkles } from 'lucide-react';
-import { Product, Deal, Category } from '@/types';
+import { Product, Deal } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import DealCard from '@/components/DealCard';
 import ProductModal from '@/components/ProductModal';
@@ -14,7 +14,6 @@ function MenuContent() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -24,30 +23,28 @@ function MenuContent() {
   useEffect(() => {
     const cat = searchParams.get('category');
     if (cat) {
-      setActiveCategory(cat);
+      startTransition(() => setActiveCategory(cat));
     }
   }, [searchParams]);
 
   // Fetch menu data from API
   useEffect(() => {
-    async function fetchMenu() {
-      try {
-        const [prodRes, dealRes] = await Promise.all([
-          fetch('/api/admin/products'),
-          fetch('/api/admin/deals'),
-        ]);
-        const prodData = await prodRes.json();
-        const dealData = await dealRes.json();
-
-        if (prodData.products) setProducts(prodData.products);
-        if (dealData.deals) setDeals(dealData.deals);
-      } catch (err) {
-        console.error('Failed to load menu data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMenu();
+    const controller = new AbortController();
+    fetch('/api/menu', { signal: controller.signal })
+      .then(async (response) => {
+        const menuData = await response.json();
+        if (menuData.products) setProducts(menuData.products);
+        if (menuData.deals) setDeals(menuData.deals);
+      })
+      .catch((err: unknown) => {
+        if (!controller.signal.aborted) {
+          console.error('Failed to load menu data:', err);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const categoryList = [

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDiningTables, upsertDiningTable, deleteDiningTable } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) return unauthorized;
   try {
     const tables = await getDiningTables();
     return NextResponse.json({ success: true, tables });

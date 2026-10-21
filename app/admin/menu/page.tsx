@@ -106,8 +106,8 @@ export default function AdminMenuPage() {
       setImageUploadError('Choose a JPG, PNG, or WebP image.');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setImageUploadError('Image must be 2 MB or smaller.');
+    if (file.size > 4 * 1024 * 1024) {
+      setImageUploadError('Image must be 4 MB or smaller.');
       return;
     }
 
@@ -407,7 +407,7 @@ export default function AdminMenuPage() {
                   onChange={handleImageUpload}
                   className="mt-2 block w-full text-[11px] text-zinc-400 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-2 file:font-bold file:text-zinc-950"
                 />
-                <p className="mt-1 text-[10px] text-zinc-500">Upload an image up to 2 MB. It is saved with this menu item.</p>
+                <p className="mt-1 text-[10px] text-zinc-500">Upload an image up to 4 MB. It is saved with this menu item.</p>
                 {imageUploadError && <p className="mt-1 text-[11px] text-red-400">{imageUploadError}</p>}
               </div>
 

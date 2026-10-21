@@ -16,7 +16,7 @@ export default function TableSelectionPage() {
   useEffect(() => {
     async function loadTables() {
       try {
-        const res = await fetch('/api/admin/tables');
+        const res = await fetch('/api/tables');
         const data = await res.json();
         if (data.tables) setTables(data.tables);
       } catch (err) {

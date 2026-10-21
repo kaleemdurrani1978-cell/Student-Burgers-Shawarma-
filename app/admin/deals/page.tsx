@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Plus, Edit2, Trash2, Flame, Users, Check, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, RefreshCw } from 'lucide-react';
 import { Deal } from '@/types';
 
 export default function AdminDealsPage() {
@@ -10,6 +10,8 @@ export default function AdminDealsPage() {
   const [loading, setLoading] = useState(true);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [isNew, setIsNew] = useState(false);
+  const [error, setError] = useState('');
+  const [imageUploadError, setImageUploadError] = useState('');
 
   const fetchDeals = async () => {
     try {
@@ -24,7 +26,13 @@ export default function AdminDealsPage() {
   };
 
   useEffect(() => {
-    fetchDeals();
+    fetch('/api/admin/deals')
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok && data.deals) setDeals(data.deals);
+      })
+      .catch(() => setError('Could not load deals. Please refresh and try again.'))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleToggleAvailability = async (deal: Deal) => {
@@ -48,6 +56,7 @@ export default function AdminDealsPage() {
     if (!editingDeal) return;
 
     try {
+      setError('');
       const res = await fetch('/api/admin/deals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,9 +71,76 @@ export default function AdminDealsPage() {
         }
         setEditingDeal(null);
         setIsNew(false);
+      } else {
+        setError(data.error || 'Could not save this deal.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setError('Connection error. Please try again.');
+    }
+  };
+
+  const handleAddDeal = () => {
+    const nextDealNumber = Math.max(0, ...deals.map((deal) => deal.dealNumber)) + 1;
+    setEditingDeal({
+      id: `custom-deal-${Date.now()}`,
+      dealNumber: nextDealNumber,
+      nameEn: '',
+      nameUr: '',
+      price: 0,
+      components: [{ nameEn: '', nameUr: '', quantity: 1 }],
+      descriptionEn: '',
+      image: '',
+      isAvailable: true,
+      verifiedFromMenu: false,
+    });
+    setIsNew(true);
+    setError('');
+    setImageUploadError('');
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !editingDeal) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setImageUploadError('Choose a JPG, PNG, or WebP image.');
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setImageUploadError('Image must be 4 MB or smaller.');
+      return;
+    }
+
+    setImageUploadError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result;
+      if (typeof imageData !== 'string') {
+        setImageUploadError('Could not read this image file.');
+        return;
+      }
+      setEditingDeal((deal) => (deal ? { ...deal, image: imageData } : deal));
+    };
+    reader.onerror = () => setImageUploadError('Could not read this image file.');
+    reader.readAsDataURL(file);
+  };
+
+  const handleDeleteDeal = async (deal: Deal) => {
+    if (!confirm(`Delete ${deal.nameEn}? This cannot be undone.`)) return;
+    try {
+      const response = await fetch(`/api/admin/deals?id=${encodeURIComponent(deal.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setError(data.error || 'Could not delete this deal.');
+        return;
+      }
+      setDeals((current) => current.filter((item) => item.id !== deal.id));
+      setError('');
+    } catch {
+      setError('Connection error. Please try again.');
     }
   };
 
@@ -79,14 +155,29 @@ export default function AdminDealsPage() {
           </p>
         </div>
 
-        <button
-          onClick={fetchDeals}
-          className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 text-zinc-300 px-3.5 py-2 rounded-xl text-xs font-bold hover:text-white"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          <span>Refresh</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={fetchDeals}
+            className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 text-zinc-300 px-3.5 py-2 rounded-xl text-xs font-bold hover:text-white"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={handleAddDeal}
+            className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 px-3.5 py-2 rounded-xl text-xs font-black"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Deal</span>
+          </button>
+        </div>
       </div>
+
+      {error && (
+        <div role="alert" className="rounded-xl border border-red-800 bg-red-950/60 px-4 py-3 text-xs text-red-200">
+          {error}
+        </div>
+      )}
 
       {/* Deals Grid */}
       {loading ? (
@@ -147,13 +238,26 @@ export default function AdminDealsPage() {
                   {deal.isAvailable ? 'Active & Available' : 'Temporarily Off'}
                 </button>
 
-                <button
-                  onClick={() => setEditingDeal(deal)}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  <span>Edit Deal</span>
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleDeleteDeal(deal)}
+                    className="bg-red-950/60 hover:bg-red-900 text-red-300 px-2.5 py-1.5 rounded-xl text-xs font-bold"
+                    aria-label={`Delete ${deal.nameEn}`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingDeal(deal);
+                      setIsNew(false);
+                      setImageUploadError('');
+                    }}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Deal</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -165,16 +269,46 @@ export default function AdminDealsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
           <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-5 my-8">
             <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-              <h3 className="text-lg font-black text-white">Edit {editingDeal.nameEn}</h3>
-              <button onClick={() => setEditingDeal(null)} className="text-zinc-400 hover:text-white">
+              <h3 className="text-lg font-black text-white">
+                {isNew ? 'Create Deal' : `Edit ${editingDeal.nameEn}`}
+              </h3>
+              <button
+                onClick={() => {
+                  setEditingDeal(null);
+                  setIsNew(false);
+                  setError('');
+                }}
+                className="text-zinc-400 hover:text-white"
+              >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSaveDeal} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveDeal} className="space-y-4 text-xs max-h-[75vh] overflow-y-auto pr-1">
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Deal Title (English)</label>
+                <label htmlFor="deal-number" className="text-zinc-300 font-bold block mb-1">
+                  Deal Number
+                </label>
                 <input
+                  id="deal-number"
+                  type="number"
+                  required
+                  min="1"
+                  step="1"
+                  value={editingDeal.dealNumber}
+                  onChange={(e) =>
+                    setEditingDeal({ ...editingDeal, dealNumber: Number(e.target.value) })
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="deal-name-en" className="text-zinc-300 font-bold block mb-1">
+                  Deal Title (English)
+                </label>
+                <input
+                  id="deal-name-en"
                   type="text"
                   required
                   value={editingDeal.nameEn}
@@ -184,8 +318,11 @@ export default function AdminDealsPage() {
               </div>
 
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Deal Title (Urdu)</label>
+                <label htmlFor="deal-name-ur" className="text-zinc-300 font-bold block mb-1">
+                  Deal Title (Urdu)
+                </label>
                 <input
+                  id="deal-name-ur"
                   type="text"
                   required
                   value={editingDeal.nameUr}
@@ -195,10 +332,15 @@ export default function AdminDealsPage() {
               </div>
 
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Price (PKR)</label>
+                <label htmlFor="deal-price" className="text-zinc-300 font-bold block mb-1">
+                  Price (PKR)
+                </label>
                 <input
+                  id="deal-price"
                   type="number"
                   required
+                  min="0"
+                  step="1"
                   value={editingDeal.price}
                   onChange={(e) =>
                     setEditingDeal({ ...editingDeal, price: parseFloat(e.target.value) || 0 })
@@ -208,8 +350,11 @@ export default function AdminDealsPage() {
               </div>
 
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Image URL</label>
+                <label htmlFor="deal-image" className="text-zinc-300 font-bold block mb-1">
+                  Image URL
+                </label>
                 <input
+                  id="deal-image"
                   type="text"
                   required
                   value={editingDeal.image}
@@ -218,9 +363,58 @@ export default function AdminDealsPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <label
+                  htmlFor="deal-image-upload"
+                  className="block text-zinc-300 font-bold"
+                >
+                  Or upload an image (JPG, PNG, WebP; max 4 MB)
+                </label>
+                <input
+                  id="deal-image-upload"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageUpload}
+                  className="block w-full cursor-pointer rounded-xl border border-zinc-800 bg-zinc-900 text-xs text-zinc-300 file:mr-3 file:cursor-pointer file:border-0 file:bg-amber-500 file:px-3 file:py-2 file:font-bold file:text-zinc-950 hover:file:bg-amber-400"
+                />
+                {imageUploadError && (
+                  <p role="alert" className="text-xs text-red-300">
+                    {imageUploadError}
+                  </p>
+                )}
+                {editingDeal.image && (
+                  <div className="relative h-36 w-full overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+                    <Image
+                      src={editingDeal.image}
+                      alt={`${editingDeal.nameEn || 'Deal'} image preview`}
+                      fill
+                      unoptimized={editingDeal.image.startsWith('data:')}
+                      className="object-contain"
+                    />
+                    <span className="absolute bottom-2 left-2 rounded-md bg-zinc-950/80 px-2 py-1 text-[10px] text-zinc-200">
+                      Image preview
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2 text-zinc-300 font-bold">
+                <input
+                  type="checkbox"
+                  checked={Boolean(editingDeal.isFamilyDeal)}
+                  onChange={(e) =>
+                    setEditingDeal({ ...editingDeal, isFamilyDeal: e.target.checked })
+                  }
+                />
+                Mark as a family deal
+              </label>
+
               <div>
-                <label className="text-zinc-300 font-bold block mb-1">Description / Composition</label>
+                <label htmlFor="deal-description" className="text-zinc-300 font-bold block mb-1">
+                  Description / Composition
+                </label>
                 <textarea
+                  id="deal-description"
                   rows={2}
                   value={editingDeal.descriptionEn}
                   onChange={(e) =>
@@ -230,10 +424,93 @@ export default function AdminDealsPage() {
                 />
               </div>
 
+              <section className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white">Bundle Components</h4>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingDeal({
+                        ...editingDeal,
+                        components: [
+                          ...editingDeal.components,
+                          { nameEn: '', nameUr: '', quantity: 1 },
+                        ],
+                      })
+                    }
+                    className="inline-flex items-center gap-1 text-amber-400 font-bold"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add item
+                  </button>
+                </div>
+                {editingDeal.components.map((component, index) => (
+                  <div key={index} className="grid grid-cols-[1fr_1fr_76px_32px] gap-2">
+                    <input
+                      type="text"
+                      required
+                      aria-label={`Component ${index + 1} English name`}
+                      placeholder="Item name"
+                      value={component.nameEn}
+                      onChange={(e) => {
+                        const components = [...editingDeal.components];
+                        components[index] = { ...component, nameEn: e.target.value };
+                        setEditingDeal({ ...editingDeal, components });
+                      }}
+                      className="min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 py-2 text-white"
+                    />
+                    <input
+                      type="text"
+                      aria-label={`Component ${index + 1} Urdu name`}
+                      placeholder="Urdu name"
+                      value={component.nameUr}
+                      onChange={(e) => {
+                        const components = [...editingDeal.components];
+                        components[index] = { ...component, nameUr: e.target.value };
+                        setEditingDeal({ ...editingDeal, components });
+                      }}
+                      className="min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 py-2 text-white font-urdu"
+                    />
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      step="1"
+                      aria-label={`Component ${index + 1} quantity`}
+                      value={component.quantity}
+                      onChange={(e) => {
+                        const components = [...editingDeal.components];
+                        components[index] = { ...component, quantity: Number(e.target.value) };
+                        setEditingDeal({ ...editingDeal, components });
+                      }}
+                      className="min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 py-2 text-white"
+                    />
+                    <button
+                      type="button"
+                      disabled={editingDeal.components.length === 1}
+                      aria-label={`Remove component ${index + 1}`}
+                      onClick={() =>
+                        setEditingDeal({
+                          ...editingDeal,
+                          components: editingDeal.components.filter((_, itemIndex) => itemIndex !== index),
+                        })
+                      }
+                      className="text-red-400 disabled:opacity-30"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </section>
+
               <div className="flex gap-2 pt-4 border-t border-zinc-800">
                 <button
                   type="button"
-                  onClick={() => setEditingDeal(null)}
+                  onClick={() => {
+                    setEditingDeal(null);
+                    setIsNew(false);
+                    setError('');
+                  }}
                   className="flex-1 bg-zinc-900 text-zinc-300 py-2.5 rounded-xl font-bold"
                 >
                   Cancel
@@ -242,7 +519,7 @@ export default function AdminDealsPage() {
                   type="submit"
                   className="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black py-2.5 rounded-xl"
                 >
-                  Save Deal Changes
+                  {isNew ? 'Create Deal' : 'Save Deal Changes'}
                 </button>
               </div>
             </form>

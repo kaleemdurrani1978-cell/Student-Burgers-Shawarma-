@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { CartProvider } from '@/context/CartContext';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
-import TableParamDetector from '@/components/TableParamDetector';
+import SiteShell from '@/components/SiteShell';
 
 export const metadata: Metadata = {
   title: 'Student Pizza & Fastfood | Shawarma, Burgers & Deals (Lahore)',
@@ -96,13 +92,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-[#0c0a09] text-zinc-100 antialiased selection:bg-amber-500 selection:text-zinc-950">
-        <CartProvider>
-          <TableParamDetector />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <CartDrawer />
-          <Footer />
-        </CartProvider>
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

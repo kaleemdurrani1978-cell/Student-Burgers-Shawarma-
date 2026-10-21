@@ -19,10 +19,45 @@ import {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [authorizedPath, setAuthorizedPath] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const isPublicAdminPage =
+      pathname === '/admin/login' || pathname.startsWith('/admin/tables/print/');
+    if (isPublicAdminPage) {
+      return;
+    }
+
+    let isCurrent = true;
+    fetch('/api/admin/session', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) {
+          router.replace('/admin/login');
+          return;
+        }
+        if (isCurrent) setAuthorizedPath(pathname);
+      })
+      .catch(() => router.replace('/admin/login'))
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [pathname, router]);
 
   // If on login page, don't show admin chrome
   if (pathname === '/admin/login' || pathname.startsWith('/admin/tables/print/')) {
     return <>{children}</>;
+  }
+
+  if (authorizedPath !== pathname) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">
+        <div className="flex items-center gap-3 text-sm">
+          <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <span>Verifying admin session...</span>
+        </div>
+      </div>
+    );
   }
 
   const navLinks = [
@@ -36,8 +71,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   const handleLogout = async () => {
-    await fetch('/api/admin/login', { method: 'DELETE' });
-    router.push('/admin/login');
+    try {
+      await fetch('/api/admin/login', { method: 'DELETE' });
+    } finally {
+      setAuthorizedPath(null);
+      router.replace('/admin/login');
+    }
   };
 
   return (
@@ -145,15 +184,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Mobile Bottom Navigation Bar (Optimized for One-Hand Mobile Use) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 flex items-center justify-around py-2 px-1">
-        {navLinks.slice(0, 5).map((item) => {
+      <nav
+        aria-label="Admin navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 flex items-center justify-start gap-2 overflow-x-auto py-2 px-2"
+      >
+        {navLinks.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+              className={`flex shrink-0 flex-col items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
                 isActive ? 'text-amber-400' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
@@ -162,15 +204,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
           );
         })}
-        <Link
-          href="/admin/settings"
-          className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold ${
-            pathname === '/admin/settings' ? 'text-amber-400' : 'text-zinc-400'
-          }`}
-        >
-          <Settings className="w-4 h-4" />
-          <span>Settings</span>
-        </Link>
       </nav>
     </div>
   );

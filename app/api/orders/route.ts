@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverValidateAndCreateOrder, getOrders } from '@/lib/db';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +31,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) return unauthorized;
   try {
     const { searchParams } = new URL(req.url);
     const table = searchParams.get('table');

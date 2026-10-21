@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts, upsertProduct, deleteProduct } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
+import { isValidAdminImageDataUrl } from '@/lib/adminImageUpload';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) return unauthorized;
   try {
     const products = await getProducts();
     return NextResponse.json({ success: true, products });
@@ -31,8 +34,7 @@ export async function POST(req: NextRequest) {
     }
     if (
       product.image.startsWith('data:') &&
-      (!/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(product.image) ||
-        product.image.length > 2_800_000)
+      !isValidAdminImageDataUrl(product.image)
     ) {
       return NextResponse.json({ success: false, error: 'Uploaded image is invalid or too large' }, { status: 400 });
     }

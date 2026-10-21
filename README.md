@@ -69,7 +69,7 @@ Every readable item, price in PKR, and deal bundle was extracted directly from t
 ## 📸 Food Photography
 
 In accordance with Section 4 of the specification:
-* The 31 menu products and 14 deals use local food photography in `/public/images/`; admin can upload a replacement image up to 2 MB per item.
+* The 31 menu products and 14 deals use local food photography in `/public/images/`; admin can upload a replacement JPG, PNG, or WebP image up to 4 MB per item.
 * Automated checks (`scripts/verify-all.ts`) verify every product and deal image exists on disk.
 
 ---
@@ -116,10 +116,11 @@ Please confirm availability and the order total.
 ## 🛡️ Full Admin Dashboard (`/admin`)
 
 Designed for the restaurant owner to control operations from a smartphone:
+* **Secure Staff Access:** Sign in at `/admin/login` with the private `ADMIN_USERNAME` and `ADMIN_SECRET_KEY` configured in `.env.local`; a signed, HTTP-only session protects admin data and changes.
 * **Overview:** Real-time today's orders count, recorded sales revenue, pending alerts, and bestsellers.
 * **Order Management:** Filter by status, search by customer, filter by dining table, one-click WhatsApp customer reply, kitchen notes, and CSV export.
 * **Menu Management:** Add new items, edit PKR prices, update Urdu names, upload images, and toggle "In Stock" / "Sold Out".
-* **Deals Management:** Edit deal bundles and bundle component quantities.
+* **Deals Management:** Create, edit, and delete deals; update prices, availability, family-deal status, images, and bundle components.
 * **QR Table Management:** Add tables, generate QR codes, download PNGs, and print standees.
 * **Menu Verification Audit:** Side-by-side audit checklist comparing live database records against the original printed cards.
 * **Business Settings:** Update phone numbers, WhatsApp click-to-chat recipient, delivery fees, hours, and homepage announcement banners.

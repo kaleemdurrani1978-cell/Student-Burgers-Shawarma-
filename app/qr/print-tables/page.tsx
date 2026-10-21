@@ -20,7 +20,7 @@ export default function PrintAllTableQRCodesPage() {
   useEffect(() => {
     async function createPrintableCodes() {
       try {
-        const response = await fetch('/api/admin/tables');
+        const response = await fetch('/api/tables');
         if (!response.ok) {
           throw new Error('Could not load restaurant tables.');
         }
