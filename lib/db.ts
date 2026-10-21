@@ -22,6 +22,13 @@ import {
   initialDiningTables,
 } from './initialData';
 
+export interface StoredAdminCredentials {
+  username: string;
+  salt: string;
+  passwordHash: string;
+  sessionVersion: string;
+}
+
 interface DatabaseSchema {
   dealMenuVersion?: number;
   dailySales?: Record<
@@ -46,6 +53,7 @@ interface DatabaseSchema {
   settings: BusinessSettings;
   tables: DiningTable[];
   orders: Order[];
+  adminCredentials?: StoredAdminCredentials;
 }
 
 const DATA_DIR = path.join(process.cwd(), '.data');
@@ -274,13 +282,37 @@ function loadDatabase(): DatabaseSchema {
   return memoryCache;
 }
 
-function persistDatabase(db: DatabaseSchema): void {
-  memoryCache = db;
+function persistDatabase(db: DatabaseSchema, requirePersistence = false): void {
   try {
     ensureDataDir();
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf-8');
-  } catch {
+    memoryCache = db;
+  } catch (error) {
+    if (requirePersistence) {
+      throw new Error('Could not persist admin credentials.', { cause: error });
+    }
+    memoryCache = db;
     // Fail gracefully in read-only environments; memoryCache holds current state
+  }
+}
+
+export function getStoredAdminCredentials(): StoredAdminCredentials | null {
+  return loadDatabase().adminCredentials ?? null;
+}
+
+export function getAdminSessionVersion(): string {
+  return loadDatabase().adminCredentials?.sessionVersion ?? 'environment-admin-credentials';
+}
+
+export function updateStoredAdminCredentials(credentials: StoredAdminCredentials): void {
+  const db = loadDatabase();
+  const previousCredentials = db.adminCredentials;
+  db.adminCredentials = credentials;
+  try {
+    persistDatabase(db, true);
+  } catch (error) {
+    db.adminCredentials = previousCredentials;
+    throw error;
   }
 }
 

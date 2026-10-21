@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_SESSION_COOKIE, ADMIN_SESSION_MAX_AGE, createAdminSessionToken } from '@/lib/adminAuth';
+import { verifyAdminLogin } from '@/lib/adminCredentials';
+import { getStoredAdminCredentials } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,17 +17,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Username and password are required.' }, { status: 400 });
     }
     const { username, password } = body;
-    const expectedUsername = process.env.ADMIN_USERNAME;
-    const expectedKey = process.env.ADMIN_SECRET_KEY;
+    const hasStoredCredentials = Boolean(getStoredAdminCredentials());
 
-    if (!expectedUsername || !expectedKey) {
+    if (
+      !hasStoredCredentials &&
+      (!process.env.ADMIN_USERNAME || !process.env.ADMIN_SECRET_KEY)
+    ) {
       return NextResponse.json(
         { success: false, error: 'Admin login is not configured on this server.' },
         { status: 503 }
       );
     }
 
-    if (username !== expectedUsername || password !== expectedKey) {
+    if (!(await verifyAdminLogin(username, password))) {
       return NextResponse.json({ success: false, error: 'Invalid password or PIN' }, { status: 401 });
     }
 

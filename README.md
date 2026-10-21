@@ -116,7 +116,7 @@ Please confirm availability and the order total.
 ## 🛡️ Full Admin Dashboard (`/admin`)
 
 Designed for the restaurant owner to control operations from a smartphone:
-* **Secure Staff Access:** Sign in at `/admin/login` with the private `ADMIN_USERNAME` and `ADMIN_SECRET_KEY` configured in `.env.local`; a signed, HTTP-only session protects admin data and changes.
+* **Secure Staff Access:** Sign in at `/admin/login` with the private `ADMIN_USERNAME` and `ADMIN_SECRET_KEY` configured in `.env.local`; a signed, HTTP-only session protects admin data and changes. Owners can change both values from **Admin → Settings → Admin Login Credentials**; changes require the current password, store only a salted password hash, and sign out existing sessions.
 * **Overview:** Real-time today's orders count, recorded sales revenue, pending alerts, and bestsellers.
 * **Order Management:** Filter by status, search by customer, filter by dining table, one-click WhatsApp customer reply, kitchen notes, and CSV export.
 * **Menu Management:** Add new items, edit PKR prices, update Urdu names, upload images, and toggle "In Stock" / "Sold Out".
@@ -148,7 +148,7 @@ git push -u origin master
    * `NEXT_PUBLIC_DEFAULT_WHATSAPP` = `923094222283`
 4. Click **Deploy**. Vercel will build the application using `npm run build` and launch it globally on high-speed CDN.
 
-The built-in JSON database is intended for local development. Before using the online admin to persist menu edits or uploaded images, connect a durable database and image storage service; serverless hosting does not guarantee writable persistent local files. GitHub stores the source code and does not itself deploy or host the app.
+The built-in JSON database (including admin credential overrides) is intended for local development and requires a writable, durable `.data` directory. Before using the online admin to persist menu edits, credentials, or uploaded images, connect a durable database and image storage service; serverless hosting does not guarantee writable persistent local files. GitHub stores the source code and does not itself deploy or host the app.
 
 ---
 
