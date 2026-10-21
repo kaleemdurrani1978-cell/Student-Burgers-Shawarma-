@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrderById, updateOrderStatus, markWhatsAppDeclaredSent } from '@/lib/db';
+import { deleteOrder, getOrderById, updateOrderStatus, markWhatsAppDeclaredSent } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 
 export async function GET(
@@ -55,5 +55,25 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: 'Invalid update payload' }, { status: 400 });
   } catch {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) return unauthorized;
+
+  try {
+    const { id } = await params;
+    const deleted = await deleteOrder(id);
+    if (!deleted) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ success: false, error: 'Failed to delete order' }, { status: 500 });
   }
 }

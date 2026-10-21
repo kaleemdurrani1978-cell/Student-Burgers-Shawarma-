@@ -398,6 +398,16 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
   return db.orders.find((o) => o.id === id);
 }
 
+export async function deleteOrder(orderId: string): Promise<boolean> {
+  const db = loadDatabase();
+  const orderIndex = db.orders.findIndex((order) => order.id === orderId);
+  if (orderIndex === -1) return false;
+
+  db.orders.splice(orderIndex, 1);
+  persistDatabase(db);
+  return true;
+}
+
 /**
  * Authoritative Server-Side Order Price Validation:
  * Never trusts prices sent by the client. Re-queries products/deals from the DB,

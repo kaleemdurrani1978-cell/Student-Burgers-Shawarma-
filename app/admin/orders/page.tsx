@@ -15,6 +15,7 @@ import {
   Bike,
   Utensils,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 
@@ -27,6 +28,8 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [prepTimeInput, setPrepTimeInput] = useState<string>('');
   const [notesInput, setNotesInput] = useState<string>('');
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const fetchOrders = async () => {
     try {
@@ -64,6 +67,32 @@ export default function AdminOrdersPage() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteOrder = async (order: Order) => {
+    const confirmed = window.confirm(
+      `Delete order ${order.id} for ${order.customerName}? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeletingOrderId(order.id);
+    setDeleteError('');
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(order.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete order.');
+      }
+
+      setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id));
+      setSelectedOrder((currentOrder) => currentOrder?.id === order.id ? null : currentOrder);
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete order.');
+    } finally {
+      setDeletingOrderId(null);
     }
   };
 
@@ -155,6 +184,12 @@ export default function AdminOrdersPage() {
           </button>
         </div>
       </div>
+
+      {deleteError && (
+        <p role="alert" className="rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-xs text-red-300">
+          {deleteError}
+        </p>
+      )}
 
       {/* Filters Bar */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
@@ -333,6 +368,16 @@ export default function AdminOrdersPage() {
                         >
                           <Phone className="w-4 h-4" />
                         </a>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteOrder(ord)}
+                          disabled={deletingOrderId === ord.id}
+                          className="p-1.5 rounded-lg bg-red-950/60 border border-red-900 text-red-300 hover:bg-red-900 disabled:cursor-wait disabled:opacity-50"
+                          title={`Delete order ${ord.id}`}
+                          aria-label={`Delete order ${ord.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
