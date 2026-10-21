@@ -87,13 +87,13 @@ export default function PrintAllTableQRCodesPage() {
             <div className="flex items-center gap-3">
               <Image
                 src="/images/branding/icon-192.png"
-                alt="Student Pizza & Fastfood"
+                alt="Student Burgers & Shawarmas"
                 width={48}
                 height={48}
                 className="rounded-lg"
               />
               <div className="text-left">
-                <h1 className="text-lg font-black text-red-600">Student Pizza &amp; Fastfood</h1>
+                <h1 className="text-lg font-black text-red-600">Student Burgers &amp; Shawarmas</h1>
                 <p className="text-xs font-bold text-zinc-600">Scan to order at your table</p>
               </div>
             </div>

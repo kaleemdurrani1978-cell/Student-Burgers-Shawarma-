@@ -88,7 +88,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-16 h-16 bg-[#fff500] rounded-xl p-0.5 flex items-center justify-center border border-amber-300 shrink-0">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Student Pizza & Fastfood logo"
+              alt="Student Burgers & Shawarmas logo"
               width={64}
               height={64}
               className="h-full w-full object-contain"
@@ -98,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="text-xs uppercase font-black text-amber-400 block leading-none">
               Control Panel
             </span>
-            <span className="text-sm font-black text-white">Student Pizza &amp; Fastfood</span>
+            <span className="text-sm font-black text-white">Student Burgers &amp; Shawarmas</span>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-12 h-12 bg-[#fff500] rounded-lg p-0.5 flex items-center justify-center">
               <Image
                 src="/images/branding/icon-192.png"
-                alt="Student Pizza & Fastfood logo"
+                alt="Student Burgers & Shawarmas logo"
                 width={48}
                 height={48}
                 className="h-full w-full object-contain"

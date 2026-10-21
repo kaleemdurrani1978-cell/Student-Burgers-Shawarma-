@@ -24,7 +24,7 @@ export default function Footer({
               <div className="w-16 h-16 bg-[#fff500] rounded-xl border border-amber-300 p-0.5 shadow-md flex items-center justify-center shrink-0">
                 <Image
                   src="/images/branding/icon-192.png"
-                  alt="Student Pizza & Fastfood logo"
+                  alt="Student Burgers & Shawarmas logo"
                   width={64}
                   height={64}
                   className="h-full w-full object-contain"
@@ -32,9 +32,9 @@ export default function Footer({
               </div>
               <div>
                 <h3 className="text-xl font-black italic text-amber-400 leading-none">
-                  <span className="text-red-500">STUDENT PIZZA</span> &amp; FASTFOOD
+                  <span className="text-red-500">STUDENT BURGERS</span> &amp; SHAWARMAS
                 </h3>
-                <p className="text-xs text-zinc-400 font-urdu mt-0.5">سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ</p>
+                <p className="text-xs text-zinc-400 font-urdu mt-0.5">سٹوڈنٹ برگرز اینڈ شوارماز</p>
               </div>
             </div>
             <p className="text-xs leading-relaxed text-zinc-400">
@@ -147,11 +147,34 @@ export default function Footer({
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
-          <p>© {new Date().getFullYear()} Student Pizza &amp; Fastfood. All prices in PKR (Rs.).</p>
+          <p>© {new Date().getFullYear()} Student Burgers &amp; Shawarmas. All prices in PKR (Rs.).</p>
           <div className="flex items-center gap-1 text-zinc-400">
             <span>Crafted with</span>
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" />
-            <span>for Student Pizza &amp; Fastfood Lahore</span>
+            <span>for Student Burgers &amp; Shawarmas Lahore</span>
+          </div>
+        </div>
+
+        <div className="mt-6 border-t border-zinc-800/80 pt-6 flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+          <Image
+            src="/images/branding/durrani-web-developers.png"
+            alt="Durrani Web Developers logo"
+            width={56}
+            height={56}
+            className="h-14 w-14 object-contain"
+          />
+          <div className="space-y-1">
+            <p className="text-zinc-300">
+              This website was designed and developed by{' '}
+              <span className="font-bold text-white">Durrani Web Developers</span>.
+            </p>
+            <a
+              href="tel:+923054359098"
+              className="inline-flex items-center gap-1.5 font-semibold text-amber-400 hover:text-amber-300 hover:underline"
+            >
+              <Phone className="h-3.5 w-3.5" />
+              Contact: 03054359098
+            </a>
           </div>
         </div>
       </div>

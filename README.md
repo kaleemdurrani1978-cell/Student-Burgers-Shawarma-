@@ -1,17 +1,17 @@
-# 🍕 Student Pizza & Fastfood — Web Ordering & Admin Platform
+# Student Burgers & Shawarmas — Web Ordering & Admin Platform
 
-A complete, production-ready, mobile-first food ordering web application, WhatsApp checkout system, contactless QR table dining portal, and mobile-friendly admin control dashboard built for **Student Pizza & Fastfood (Lahore, Pakistan)**.
+A complete, production-ready, mobile-first food ordering web application, WhatsApp checkout system, contactless QR table dining portal, and mobile-friendly admin control dashboard built for **Student Burgers & Shawarmas (Lahore, Pakistan)**.
 
 ---
 
 ## 📌 Project Overview & Verified Business Information
 
 This application uses the current menu and business information supplied by the restaurant owner:
-* **Business Public Name:** Student Pizza & Fastfood
+* **Business Public Name:** Student Burgers & Shawarmas
 * **Primary Location:** 61 Shalimar Link Road, Ramgarh, Lahore, Punjab, Pakistan
 * **Contact & WhatsApp Candidate:** `0309-4222283` (+92 309 4222283)
 * **International WhatsApp Format:** `923094222283`
-* **Facebook Page:** [Student Pizza & Fastfood](https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/)
+* **Facebook Page:** [Student Burgers & Shawarmas](https://www.facebook.com/people/Student-pizza-Fastfood/100089295146903/)
 * **Operating Hours:** To be updated
 * **Delivery Policy:** Delivery available across Lahore with flat Rs. 100 delivery fee (`Delivery + charge`)
 * **Currency:** Pakistani Rupee (PKR / Rs. / روپے)
@@ -80,7 +80,7 @@ In accordance with Section 4 of the specification:
 2. **Order Reference:** Generates a standardized order reference (e.g. `SS-2610-8492`).
 3. **Structured WhatsApp Message:**
 ```text
-*NEW ORDER — STUDENT PIZZA & FASTFOOD*
+*NEW ORDER — STUDENT BURGERS & SHAWARMAS*
 Order ID: SS-2610-8492
 Order Type: Dine-in / Takeaway / Home Delivery
 Customer Name: Ali Ahmed
@@ -132,7 +132,7 @@ Designed for the restaurant owner to control operations from a smartphone:
 ### Step 1: Push Code to GitHub
 ```bash
 git add .
-git commit -m "feat: complete Student Pizza & Fastfood ordering web app and admin platform"
+git commit -m "feat: complete Student Burgers & Shawarmas ordering web app and admin platform"
 git remote add origin https://github.com/<your-username>/student-shawarma.git
 git push -u origin master
 ```
@@ -169,7 +169,7 @@ The application runs out-of-the-box using its built-in local persistent database
 To achieve visibility on Google Maps and search results in Lahore:
 1. **Google Business Profile:**
    * Go to [business.google.com](https://business.google.com).
-   * Claim or create **"Student Pizza & Fastfood"** at **61 Shalimar Link Road, Ramgarh, Lahore**.
+   * Claim or create **"Student Burgers & Shawarmas"** at **61 Shalimar Link Road, Ramgarh, Lahore**.
    * Set category to *Shawarma Restaurant / Fast Food Restaurant*.
    * Add the deployed website URL as the official Website and Menu link.
    * Add phone number `0309-4222283`.

@@ -63,7 +63,7 @@ export default async function HomePage() {
                     Original Lahore Brand
                   </span>
                   <span className="text-xs text-amber-400 font-urdu font-bold">
-                    سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ
+                    سٹوڈنٹ برگرز اینڈ شوارماز
                   </span>
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black italic tracking-tight text-white leading-[1.05]">
@@ -136,7 +136,7 @@ export default async function HomePage() {
               <div className="relative mx-auto max-w-md aspect-square rounded-3xl overflow-hidden border-4 border-amber-500/40 shadow-2xl shadow-amber-500/10 bg-zinc-900">
                 <Image
                   src="/images/products/chicken-shawarma-s.webp"
-                  alt="Student Pizza & Fastfood regular chicken shawarma"
+                  alt="Student Burgers & Shawarmas regular chicken shawarma"
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   priority
@@ -149,7 +149,7 @@ export default async function HomePage() {
                   <div className="w-14 h-14 rounded-lg bg-[#fff500] p-0.5 flex items-center justify-center shrink-0">
                     <Image
                       src="/images/branding/icon-192.png"
-                      alt="Student Pizza & Fastfood logo"
+                      alt="Student Burgers & Shawarmas logo"
                       width={56}
                       height={56}
                       className="h-full w-full object-contain"
@@ -347,7 +347,7 @@ export default async function HomePage() {
                   <span className="text-amber-400">Scan Your Table QR Code to Order</span>
                 </h3>
                 <p className="text-sm text-zinc-400 max-w-xl leading-relaxed">
-                  Every dining table at Student Pizza &amp; Fastfood features a unique QR standee. Scan with your
+                  Every dining table at Student Burgers &amp; Shawarmas features a unique QR standee. Scan with your
                   smartphone camera to load the live menu with your table number pre-selected, order directly,
                   and relax while our kitchen prepares your meal.
                 </p>
@@ -374,7 +374,7 @@ export default async function HomePage() {
                     T01
                   </div>
                   <h4 className="font-black text-base">Table 01 QR</h4>
-                  <p className="text-[11px] text-zinc-600 mb-3">Student Pizza &amp; Fastfood Lahore</p>
+                  <p className="text-[11px] text-zinc-600 mb-3">Student Burgers &amp; Shawarmas Lahore</p>
                   <div className="aspect-square bg-zinc-100 rounded-xl p-2 border border-zinc-200 flex items-center justify-center">
                     <QrCode className="w-32 h-32 text-zinc-900" />
                   </div>

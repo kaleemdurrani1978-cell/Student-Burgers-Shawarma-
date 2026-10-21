@@ -404,7 +404,7 @@ export default function CheckoutPage() {
                 <span>Verified Direct Kitchen Order</span>
               </div>
               <p>
-                No platform commissions. Your order reaches the Student Pizza &amp; Fastfood team at 61 Shalimar Link Road, Ramgarh directly.
+                No platform commissions. Your order reaches the Student Burgers &amp; Shawarmas team at 61 Shalimar Link Road, Ramgarh directly.
               </p>
             </div>
           </div>

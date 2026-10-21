@@ -23,7 +23,7 @@ export default function AboutPage() {
             <span>Verified Restaurant Information • Lahore, Pakistan</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black italic tracking-tight text-white">
-            ABOUT <span className="text-amber-400">STUDENT PIZZA &amp; FASTFOOD</span>
+            ABOUT <span className="text-amber-400">STUDENT BURGERS &amp; SHAWARMAS</span>
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto">
             Serving the people of Lahore delicious, high-quality fast food, authentic chicken shawarmas, crispy burgers, and pocket-friendly Student Deals.
@@ -36,7 +36,7 @@ export default function AboutPage() {
             <div className="relative w-48 h-48 bg-amber-400 rounded-3xl p-3 border-4 border-amber-300 shadow-2xl flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/branding/icon-512.png"
-                alt="Student Pizza & Fastfood logo"
+                alt="Student Burgers & Shawarmas logo"
                 fill
                 sizes="192px"
                 className="object-contain p-2"
@@ -50,14 +50,14 @@ export default function AboutPage() {
                 Established Lahore
               </span>
               <span className="text-sm font-urdu font-bold text-amber-400">
-                سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ
+                سٹوڈنٹ برگرز اینڈ شوارماز
               </span>
             </div>
             <h2 className="text-2xl font-black text-white">
               Authentic Fast-Food Heritage
             </h2>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Student Pizza &amp; Fastfood is an independent local Pakistani fast-food restaurant at 61 Shalimar Link Road, Ramgarh, Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast-food enthusiasts across the area.
+              Student Burgers &amp; Shawarmas is an independent local Pakistani fast-food restaurant at 61 Shalimar Link Road, Ramgarh, Lahore. Built on a reputation for hearty portions, student-friendly deals, and secret garlic mayo dressings, our menu is loved by students, families, and fast-food enthusiasts across the area.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-300 font-semibold">
@@ -150,7 +150,7 @@ export default function AboutPage() {
             <span>Printed Menu Authenticity Guarantee</span>
           </div>
           <p className="leading-relaxed">
-            Every product name, Urdu label, deal bundle composition, and PKR price published on this application is directly extracted from Student Pizza &amp; Fastfood&apos;s printed menus (Sides 1 &amp; 2). All orders are validated server-side to guarantee that customer pricing matches the current restaurant menu.
+            Every product name, Urdu label, deal bundle composition, and PKR price published on this application is directly extracted from Student Burgers &amp; Shawarmas&apos; printed menus (Sides 1 &amp; 2). All orders are validated server-side to guarantee that customer pricing matches the current restaurant menu.
           </p>
         </div>
       </div>

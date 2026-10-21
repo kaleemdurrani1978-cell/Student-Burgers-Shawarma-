@@ -53,11 +53,11 @@ export default function Navbar({
       <header className="sticky top-0 z-40 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800 shadow-xl">
         <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2 sm:gap-4">
           {/* Logo & Brand Identity */}
-          <Link href="/" aria-label="Student Pizza & Fastfood home" className="flex items-center gap-2 sm:gap-3 group">
+          <Link href="/" aria-label="Student Burgers & Shawarmas home" className="flex items-center gap-2 sm:gap-3 group">
             <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-[#fff500] rounded-xl border border-amber-300 p-0.5 shadow-md flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image
                 src="/images/branding/icon-192.png"
-                alt="Student Pizza & Fastfood logo"
+                alt="Student Burgers & Shawarmas logo"
                 width={48}
                 height={48}
                 className="h-full w-full object-contain"
@@ -67,14 +67,14 @@ export default function Navbar({
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="hidden lg:inline text-sm lg:text-xl font-black italic tracking-tight text-red-600 drop-shadow whitespace-nowrap">
-                  STUDENT PIZZA
+                  STUDENT BURGERS
                 </span>
                 <span className="hidden lg:inline text-sm lg:text-xl font-black italic tracking-tight text-amber-400 drop-shadow whitespace-nowrap">
-                  &amp; FASTFOOD
+                  &amp; SHAWARMAS
                 </span>
                 <span className="flex lg:hidden flex-col text-[10px] leading-tight font-black italic tracking-tight">
-                  <span className="text-red-600">STUDENT PIZZA</span>
-                  <span className="text-amber-400">&amp; FASTFOOD</span>
+                  <span className="text-red-600">STUDENT BURGERS</span>
+                  <span className="text-amber-400">&amp; SHAWARMAS</span>
                 </span>
               </div>
               <div className="hidden lg:flex items-center gap-2 text-[11px] text-zinc-400 font-medium">

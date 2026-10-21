@@ -57,7 +57,7 @@ export default function TablePrintStandeePage({
           <div className="w-16 h-16 bg-[#fff500] rounded-xl border-2 border-zinc-900 p-0.5 flex items-center justify-center">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Student Pizza & Fastfood logo"
+              alt="Student Burgers & Shawarmas logo"
               width={60}
               height={60}
               className="h-full w-full object-contain"
@@ -65,10 +65,10 @@ export default function TablePrintStandeePage({
           </div>
           <div className="text-left">
             <h1 className="text-xl font-black italic tracking-tight text-red-600 leading-none">
-              STUDENT <span className="text-amber-500">PIZZA</span>
+              STUDENT <span className="text-amber-500">BURGERS</span>
             </h1>
             <p className="text-[10px] text-zinc-700 font-bold tracking-wider uppercase">
-              Pizza &amp; Fast Food • Lahore
+              Burgers &amp; Shawarmas • Lahore
             </p>
           </div>
         </div>

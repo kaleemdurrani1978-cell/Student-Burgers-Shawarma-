@@ -656,8 +656,8 @@ export const initialDiningTables: DiningTable[] = [
 ];
 
 export const initialBusinessSettings: BusinessSettings = {
-  restaurantName: 'Student Pizza & Fastfood',
-  urduName: 'سٹوڈنٹ پیزا اینڈ فاسٹ فوڈ',
+  restaurantName: 'Student Burgers & Shawarmas',
+  urduName: 'سٹوڈنٹ برگرز اینڈ شوارماز',
   tagline: 'Best Shawarma, Burgers & Student Deals in Lahore',
   phoneCandidate: '0309-4222283',
   whatsappNumberFormatted: '923094222283',

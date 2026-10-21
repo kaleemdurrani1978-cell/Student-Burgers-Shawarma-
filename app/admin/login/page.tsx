@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
           <div className="w-28 h-28 bg-[#fff500] rounded-2xl mx-auto p-1 flex items-center justify-center border border-amber-300 shadow-md">
             <Image
               src="/images/branding/icon-192.png"
-              alt="Student Pizza & Fastfood logo"
+              alt="Student Burgers & Shawarmas logo"
               width={112}
               height={112}
               className="h-full w-full object-contain"
@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
           <div>
             <h1 className="text-2xl font-black text-white">Owner &amp; Staff Login</h1>
             <p className="text-xs text-zinc-400 mt-1">
-              Student Pizza &amp; Fastfood • Mobile Admin Control
+              Student Burgers &amp; Shawarmas • Mobile Admin Control
             </p>
           </div>
         </div>

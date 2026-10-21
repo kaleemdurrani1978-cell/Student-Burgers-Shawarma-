@@ -3,31 +3,31 @@ import './globals.css';
 import SiteShell from '@/components/SiteShell';
 
 export const metadata: Metadata = {
-  title: 'Student Pizza & Fastfood | Shawarma, Burgers & Deals (Lahore)',
+  title: 'Student Burgers & Shawarmas | Shawarma, Burgers & Deals (Lahore)',
   description:
     'Authentic chicken shawarma, zinger burgers, platters, paratha rolls, and budget student deals at 61 Shalimar Link Road, Ramgarh, Lahore. Order direct on WhatsApp or Dine-In with QR.',
   keywords: [
-    'Student Pizza & Fastfood',
-    'Student Pizza & Fastfood Lahore',
-    'Student Pizza Fastfood Lahore',
+    'Student Burgers & Shawarmas',
+    'Student Burgers & Shawarmas Lahore',
+    'Student Burgers and Shawarmas Lahore',
     '61 Shalimar Link Road Ramgarh Lahore food',
     'Zinger burger Lahore',
     'Shawarma delivery Lahore',
     'Student Deals fast food',
   ],
-  authors: [{ name: 'Student Pizza & Fastfood' }],
-  creator: 'Student Pizza & Fastfood',
-  publisher: 'Student Pizza & Fastfood',
+  authors: [{ name: 'Student Burgers & Shawarmas' }],
+  creator: 'Durrani Web Developers',
+  publisher: 'Student Burgers & Shawarmas',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Student Pizza & Fastfood | 61 Shalimar Link Road, Ramgarh, Lahore',
+    title: 'Student Burgers & Shawarmas | 61 Shalimar Link Road, Ramgarh, Lahore',
     description:
       'Craving fresh, spicy chicken shawarma and crispy zinger burgers? View our verified menu and order directly via WhatsApp or scan table QR to dine in!',
     url: '/',
-    siteName: 'Student Pizza & Fastfood',
+    siteName: 'Student Burgers & Shawarmas',
     images: [
       {
         url: '/images/hero/hero-shawarma.webp',
@@ -62,7 +62,7 @@ export default function RootLayout({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FastFoodRestaurant',
-    name: 'Student Pizza & Fastfood',
+    name: 'Student Burgers & Shawarmas',
     image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5',
     telephone: '+923094222283',
     servesCuisine: ['Fast Food', 'Pakistani', 'Shawarma', 'Burgers'],

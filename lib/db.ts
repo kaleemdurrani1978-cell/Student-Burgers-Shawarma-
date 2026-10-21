@@ -199,6 +199,14 @@ function loadDatabase(): DatabaseSchema {
         database.dealMenuVersion = 8;
         persistDatabase(database);
       }
+      if ((database.dealMenuVersion ?? 0) < 9) {
+        if (database.settings?.restaurantName === 'Student Pizza & Fastfood') {
+          database.settings.restaurantName = initialBusinessSettings.restaurantName;
+          database.settings.urduName = initialBusinessSettings.urduName;
+        }
+        database.dealMenuVersion = 9;
+        persistDatabase(database);
+      }
       if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
         database.settings.restaurantName = initialBusinessSettings.restaurantName;
         database.settings.urduName = initialBusinessSettings.urduName;
@@ -212,7 +220,7 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
-    dealMenuVersion: 8,
+    dealMenuVersion: 9,
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],
@@ -542,7 +550,7 @@ export async function serverValidateAndCreateOrder(payload: {
 
   // Build the standardized WhatsApp message required by prompt
   let messageLines: string[] = [
-    `*NEW ORDER — STUDENT PIZZA & FASTFOOD*`,
+    `*NEW ORDER — STUDENT BURGERS & SHAWARMAS*`,
     `Order ID: ${orderId}`,
     `Order Type: ${orderTypeDisplay}`,
     `Customer Name: ${payload.customerName.trim()}`,

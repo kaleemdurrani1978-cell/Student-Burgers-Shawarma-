@@ -107,7 +107,7 @@ function MenuContent() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-black italic tracking-tight text-white">
-            EXPLORE THE <span className="text-red-600">STUDENT PIZZA</span> &amp; FASTFOOD MENU
+            EXPLORE THE <span className="text-red-600">STUDENT BURGERS</span> &amp; SHAWARMAS MENU
           </h1>
           <p className="text-xs md:text-sm text-zinc-400 max-w-xl mx-auto">
             Choose from authentic shawarmas, crispy burgers, platters, and 14 value-packed Student Deals.
