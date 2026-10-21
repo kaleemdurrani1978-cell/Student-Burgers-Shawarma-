@@ -20,13 +20,19 @@ import {
   X,
   LoaderCircle,
 } from 'lucide-react';
-import { Deal, Order, OrderStatus, OrderType, Product } from '@/types';
+import { CustomerLead, Deal, Order, OrderStatus, OrderType, Product } from '@/types';
 
 type ManualOrderItem = {
   itemType: 'product' | 'deal';
   itemId: string;
   quantity: number;
 };
+
+function normalizePhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('92') && digits.length >= 12) return `0${digits.slice(-10)}`;
+  return digits.length === 10 ? `0${digits}` : digits;
+}
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -46,12 +52,14 @@ export default function AdminOrdersPage() {
   const [manualOrderSuccess, setManualOrderSuccess] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [customerLeads, setCustomerLeads] = useState<CustomerLead[]>([]);
   const [manualName, setManualName] = useState('');
   const [manualPhone, setManualPhone] = useState('');
   const [manualOrderType, setManualOrderType] = useState<OrderType>('takeaway');
   const [manualTable, setManualTable] = useState('');
   const [manualAddress, setManualAddress] = useState('');
   const [manualInstructions, setManualInstructions] = useState('');
+  const [manualMonthlyCredit, setManualMonthlyCredit] = useState(false);
   const [manualSelection, setManualSelection] = useState('');
   const [manualQuantity, setManualQuantity] = useState(1);
   const [manualItems, setManualItems] = useState<ManualOrderItem[]>([]);
@@ -60,7 +68,19 @@ export default function AdminOrdersPage() {
     try {
       const res = await fetch('/api/orders');
       const data = await res.json();
-      if (data.orders) setOrders(data.orders);
+      if (data.orders) {
+        setOrders((currentOrders) => {
+          const unchanged =
+            currentOrders.length === data.orders.length &&
+            currentOrders.every(
+              (order, index) =>
+                order.id === data.orders[index].id &&
+                order.updatedAt === data.orders[index].updatedAt &&
+                order.status === data.orders[index].status
+            );
+          return unchanged ? currentOrders : data.orders;
+        });
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -127,13 +147,15 @@ export default function AdminOrdersPage() {
     setManualOrderSuccess('');
     setMenuLoading(true);
     try {
-      const [productsResponse, dealsResponse] = await Promise.all([
+      const [productsResponse, dealsResponse, customersResponse] = await Promise.all([
         fetch('/api/admin/products'),
         fetch('/api/admin/deals'),
+        fetch('/api/admin/customers'),
       ]);
-      const [productsData, dealsData] = await Promise.all([
+      const [productsData, dealsData, customersData] = await Promise.all([
         productsResponse.json(),
         dealsResponse.json(),
+        customersResponse.json(),
       ]);
       if (!productsResponse.ok || !productsData.success) {
         throw new Error(productsData.error || 'Could not load menu products.');
@@ -141,8 +163,12 @@ export default function AdminOrdersPage() {
       if (!dealsResponse.ok || !dealsData.success) {
         throw new Error(dealsData.error || 'Could not load menu deals.');
       }
+      if (!customersResponse.ok || !customersData.success) {
+        throw new Error(customersData.error || 'Could not load customer accounts.');
+      }
       setProducts(productsData.products.filter((product: Product) => product.isAvailable && product.categoryId !== 'addons'));
       setDeals(dealsData.deals.filter((deal: Deal) => deal.isAvailable));
+      setCustomerLeads(customersData.customers as CustomerLead[]);
     } catch (error) {
       setManualOrderError(error instanceof Error ? error.message : 'Could not load menu items.');
     } finally {
@@ -216,6 +242,7 @@ export default function AdminOrdersPage() {
           tableNumber: manualOrderType === 'dine_in' ? manualTable : undefined,
           deliveryAddress: manualOrderType === 'delivery' ? manualAddress : undefined,
           specialInstructions: manualInstructions,
+          monthlyCredit: manualMonthlyCredit,
           items: manualItems,
         }),
       });
@@ -233,6 +260,7 @@ export default function AdminOrdersPage() {
       setManualAddress('');
       setManualTable('');
       setManualInstructions('');
+      setManualMonthlyCredit(false);
       setManualOrderType('takeaway');
     } catch (error) {
       setManualOrderError(error instanceof Error ? error.message : 'Could not create phone order.');
@@ -316,6 +344,7 @@ export default function AdminOrdersPage() {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={openCreateOrder}
             className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-black px-3.5 py-2 rounded-xl transition-colors"
           >
@@ -441,6 +470,9 @@ export default function AdminOrdersPage() {
 
                     <td className="px-5 py-4">
                       <span className="font-bold text-white block">{ord.customerName}</span>
+                      {ord.paymentMethod === 'monthly_credit' && (
+                        <span className="text-[9px] font-black uppercase text-amber-300">Monthly credit</span>
+                      )}
                       <a
                         href={`https://wa.me/${ord.customerPhone.replace(/\D/g, '')}`}
                         target="_blank"
@@ -508,6 +540,9 @@ export default function AdminOrdersPage() {
                       >
                         {ord.status.replace(/_/g, ' ')}
                       </span>
+                      <p className="mt-1 text-[10px] text-zinc-400">
+                        Order by: <span className="font-bold text-zinc-200">{ord.customerName}</span>
+                      </p>
                     </td>
 
                     <td className="px-5 py-4 text-right">
@@ -553,9 +588,11 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Modal: Full Order View & Status Editor */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-xl bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 my-8">
+      {(selectedOrder || showCreateOrder) && (
+        <div className={selectedOrder ? 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto' : 'contents'}>
+          <div className={selectedOrder ? 'relative w-full max-w-xl bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 my-8' : 'contents'}>
+            {selectedOrder && (
+              <>
             <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
               <div>
                 <span className="text-[10px] text-zinc-400 uppercase font-bold">Order Details</span>
@@ -605,6 +642,9 @@ export default function AdminOrdersPage() {
                   <span className="text-zinc-200">{selectedOrder.deliveryAddress}</span>
                 </div>
               )}
+            </div>
+              </>
+            )}
 
               {showCreateOrder && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
@@ -651,12 +691,35 @@ export default function AdminOrdersPage() {
                           required
                           type="tel"
                           value={manualPhone}
-                          onChange={(event) => setManualPhone(event.target.value)}
+                          onChange={(event) => {
+                            setManualPhone(event.target.value);
+                            setManualMonthlyCredit(false);
+                          }}
                           placeholder="03xx-xxxxxxx"
                           className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
                           autoComplete="tel"
                         />
                       </label>
+                      {customerLeads.some(
+                        (customer) =>
+                          customer.monthlyCreditEnabled &&
+                          customer.phone === normalizePhone(manualPhone)
+                      ) && (
+                        <label className="flex items-start gap-2 rounded-xl border border-amber-800/70 bg-amber-950/20 p-3 text-xs text-zinc-200 sm:col-span-2">
+                          <input
+                            type="checkbox"
+                            checked={manualMonthlyCredit}
+                            onChange={(event) => setManualMonthlyCredit(event.target.checked)}
+                            className="mt-0.5 accent-amber-500"
+                          />
+                          <span>
+                            Add this order to the customer&apos;s monthly credit account.
+                            <span className="mt-1 block text-[10px] text-zinc-400">
+                              Outstanding balance increases when the order is completed.
+                            </span>
+                          </span>
+                        </label>
+                      )}
                       <label className="text-xs text-zinc-300">
                         Order type
                         <select
@@ -822,8 +885,9 @@ export default function AdminOrdersPage() {
                   </form>
                 </div>
               )}
-            </div>
 
+            {selectedOrder && (
+              <>
             {/* Line Items */}
             <div className="space-y-2 text-xs">
               <h4 className="font-bold text-zinc-300">Ordered Items:</h4>
@@ -918,6 +982,8 @@ export default function AdminOrdersPage() {
                 </a>
               </div>
             </div>
+              </>
+            )}
           </div>
         </div>
       )}

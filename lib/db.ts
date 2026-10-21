@@ -10,6 +10,9 @@ import {
   OrderItemRecord,
   OrderStatus,
   OrderType,
+  CustomerCreditPayment,
+  CustomerLead,
+  DailyExpense,
 } from '@/types';
 import {
   initialProducts,
@@ -21,7 +24,22 @@ import {
 
 interface DatabaseSchema {
   dealMenuVersion?: number;
-  dailySales?: Record<string, { total: number; orderCount: number; closedAt: string }>;
+  dailySales?: Record<
+    string,
+    {
+      total: number;
+      orderCount: number;
+      closedAt: string;
+      orders?: Order[];
+      burgerCount?: number;
+      shawarmaCount?: number;
+      otherItemCount?: number;
+      itemBreakdown?: Array<{ name: string; quantity: number; revenue: number; kind: string }>;
+    }
+  >;
+  dailyExpenses?: DailyExpense[];
+  monthlyCreditAccounts?: Record<string, { enabled: boolean; updatedAt: string }>;
+  creditPayments?: CustomerCreditPayment[];
   products: Product[];
   deals: Deal[];
   categories: Category[];
@@ -218,6 +236,14 @@ function loadDatabase(): DatabaseSchema {
         database.dealMenuVersion = 10;
         persistDatabase(database);
       }
+      if ((database.dealMenuVersion ?? 0) < 11) {
+        database.dailySales ??= {};
+        database.dailyExpenses ??= [];
+        database.monthlyCreditAccounts ??= {};
+        database.creditPayments ??= [];
+        database.dealMenuVersion = 11;
+        persistDatabase(database);
+      }
       if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
         database.settings.restaurantName = initialBusinessSettings.restaurantName;
         database.settings.urduName = initialBusinessSettings.urduName;
@@ -231,8 +257,11 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
-    dealMenuVersion: 10,
+    dealMenuVersion: 11,
     dailySales: {},
+    dailyExpenses: [],
+    monthlyCreditAccounts: {},
+    creditPayments: [],
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],
@@ -424,9 +453,81 @@ function getPakistanDateKey(date: Date): string {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
+function normalizeCustomerPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('92') && digits.length >= 12) return `0${digits.slice(-10)}`;
+  return digits.length === 10 ? `0${digits}` : digits;
+}
+
+function isValidDateKey(date: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const parsed = new Date(`${date}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+}
+
+function getDailyItemSummary(orders: Order[], db: DatabaseSchema) {
+  const itemRows = new Map<string, { name: string; quantity: number; revenue: number; kind: string }>();
+  let burgerCount = 0;
+  let shawarmaCount = 0;
+  let otherItemCount = 0;
+
+  const addItem = (name: string, quantity: number, revenue: number, kind: string) => {
+    const key = `${kind}:${name}`;
+    const existing = itemRows.get(key);
+    if (existing) {
+      existing.quantity += quantity;
+      existing.revenue += revenue;
+      return;
+    }
+    itemRows.set(key, { name, quantity, revenue, kind });
+  };
+
+  for (const order of orders) {
+    for (const item of order.items) {
+      if (item.itemType === 'product') {
+        const categoryId =
+          item.categoryId ?? db.products.find((product) => product.id === item.itemId)?.categoryId ?? '';
+        const normalized = `${categoryId} ${item.nameEn}`.toLowerCase();
+        if (normalized.includes('shawarma')) {
+          shawarmaCount += item.quantity;
+        } else if (normalized.includes('burger')) {
+          burgerCount += item.quantity;
+        } else {
+          otherItemCount += item.quantity;
+        }
+        addItem(item.nameEn, item.quantity, item.subtotal, 'product');
+        continue;
+      }
+
+      addItem(item.nameEn, item.quantity, item.subtotal, 'deal');
+      const components =
+        item.components ?? db.deals.find((deal) => deal.id === item.itemId)?.components ?? [];
+      for (const component of components) {
+        const quantity = component.quantity * item.quantity;
+        const componentName = component.nameEn.toLowerCase();
+        if (componentName.includes('shawarma')) {
+          shawarmaCount += quantity;
+        } else if (componentName.includes('burger')) {
+          burgerCount += quantity;
+        } else {
+          otherItemCount += quantity;
+        }
+      }
+    }
+  }
+
+  return {
+    burgerCount,
+    shawarmaCount,
+    otherItemCount,
+    itemBreakdown: [...itemRows.values()].sort((a, b) => b.quantity - a.quantity),
+  };
+}
+
 export async function getDailySalesReport(month: string, selectedDate: string) {
   const db = loadDatabase();
   db.dailySales ??= {};
+  db.dailyExpenses ??= [];
 
   const today = getPakistanDateKey(new Date());
   const [year, monthNumber] = month.split('-').map(Number);
@@ -443,54 +544,227 @@ export async function getDailySalesReport(month: string, selectedDate: string) {
       return getPakistanDateKey(new Date(completedAt)) === date;
     });
 
+    const summary = getDailyItemSummary(completedOrders, db);
     db.dailySales[date] = {
       total: completedOrders.reduce((total, order) => total + order.grandTotal, 0),
       orderCount: completedOrders.length,
       closedAt: new Date().toISOString(),
+      orders: JSON.parse(JSON.stringify(completedOrders)) as Order[],
+      ...summary,
     };
     ledgerChanged = true;
   }
 
   const completedOrders = db.orders.filter((order) => order.status === 'completed');
   const dailySales: Record<string, { total: number; orderCount: number; closed: boolean }> = {};
+  let selectedOrders: Order[] = [];
+  let selectedSummary = getDailyItemSummary([], db);
 
   for (let day = 1; day <= daysInMonth; day += 1) {
     const date = `${month}-${String(day).padStart(2, '0')}`;
     const closing = db.dailySales[date];
     if (closing) {
+      if (!closing.orders) {
+        const closingOrders = completedOrders.filter(
+          (order) => getPakistanDateKey(new Date(order.completedAt ?? order.updatedAt)) === date
+        );
+        const summary = getDailyItemSummary(closingOrders, db);
+        closing.orders = JSON.parse(JSON.stringify(closingOrders)) as Order[];
+        Object.assign(closing, summary);
+        ledgerChanged = true;
+      }
       dailySales[date] = { total: closing.total, orderCount: closing.orderCount, closed: true };
+      if (date === selectedDate) {
+        selectedOrders = closing.orders;
+        selectedSummary = {
+          burgerCount: closing.burgerCount ?? 0,
+          shawarmaCount: closing.shawarmaCount ?? 0,
+          otherItemCount: closing.otherItemCount ?? 0,
+          itemBreakdown: closing.itemBreakdown ?? [],
+        };
+      }
       continue;
     }
     if (date === today) {
       const todaysOrders = completedOrders.filter((order) =>
         getPakistanDateKey(new Date(order.completedAt ?? order.updatedAt)) === date
       );
+      const summary = getDailyItemSummary(todaysOrders, db);
       dailySales[date] = {
         total: todaysOrders.reduce((total, order) => total + order.grandTotal, 0),
         orderCount: todaysOrders.length,
         closed: false,
       };
+      if (date === selectedDate) {
+        selectedOrders = todaysOrders.sort(
+          (a, b) =>
+            new Date(b.completedAt ?? b.updatedAt).getTime() -
+            new Date(a.completedAt ?? a.updatedAt).getTime()
+        );
+        selectedSummary = summary;
+      }
     }
   }
 
   if (ledgerChanged) persistDatabase(db);
 
-  const dayOrders = selectedDate === today || db.dailySales[selectedDate]
-    ? completedOrders
-        .filter((order) => getPakistanDateKey(new Date(order.completedAt ?? order.updatedAt)) === selectedDate)
-        .sort(
-          (a, b) =>
-            new Date(b.completedAt ?? b.updatedAt).getTime() -
-            new Date(a.completedAt ?? a.updatedAt).getTime()
-        )
-    : [];
+  const dayOrders = selectedOrders;
+  const dailyExpenses = db.dailyExpenses.filter((expense) => expense.date === selectedDate);
 
   return {
     monthlyTotal: Object.values(dailySales).reduce((total, sales) => total + sales.total, 0),
     monthlyOrderCount: Object.values(dailySales).reduce((total, sales) => total + sales.orderCount, 0),
     dailySales,
     dayOrders,
+    dailyExpenses,
+    dailyExpenseTotal: dailyExpenses.reduce((total, expense) => total + expense.amount, 0),
+    ...selectedSummary,
   };
+}
+
+export async function addDailyExpense(
+  date: string,
+  description: string,
+  amount: number
+): Promise<DailyExpense> {
+  if (!isValidDateKey(date) || date > getPakistanDateKey(new Date())) {
+    throw new Error('Choose a valid date that is today or earlier.');
+  }
+  if (!description.trim() || description.trim().length > 120) {
+    throw new Error('Enter a purchase description (up to 120 characters).');
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Purchase amount must be greater than zero.');
+  }
+
+  const db = loadDatabase();
+  db.dailyExpenses ??= [];
+  const expense: DailyExpense = {
+    id: `EXP-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    date,
+    description: description.trim(),
+    amount: Math.round(amount * 100) / 100,
+    createdAt: new Date().toISOString(),
+  };
+  db.dailyExpenses.push(expense);
+  persistDatabase(db);
+  return expense;
+}
+
+export async function deleteDailyExpense(id: string): Promise<boolean> {
+  const db = loadDatabase();
+  db.dailyExpenses ??= [];
+  const nextExpenses = db.dailyExpenses.filter((expense) => expense.id !== id);
+  if (nextExpenses.length === db.dailyExpenses.length) return false;
+  db.dailyExpenses = nextExpenses;
+  persistDatabase(db);
+  return true;
+}
+
+export async function getCustomerLeads(month: string): Promise<CustomerLead[]> {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) throw new Error('A valid month is required.');
+  const db = loadDatabase();
+  db.monthlyCreditAccounts ??= {};
+  db.creditPayments ??= [];
+  const creditPayments = db.creditPayments;
+  const customers = new Map<string, Order[]>();
+
+  for (const order of db.orders) {
+    const phone = normalizeCustomerPhone(order.customerPhone);
+    const customerOrders = customers.get(phone) ?? [];
+    customerOrders.push(order);
+    customers.set(phone, customerOrders);
+  }
+
+  return [...customers.entries()]
+    .map(([phone, orders]) => {
+      const completedOrders = orders.filter((order) => order.status === 'completed');
+      const customerOrders = orders.filter((order) => order.status !== 'cancelled');
+      const thisMonthOrders = customerOrders.filter((order) =>
+        getPakistanDateKey(new Date(order.createdAt)).startsWith(`${month}-`)
+      );
+      const creditOrders = completedOrders.filter((order) => order.paymentMethod === 'monthly_credit');
+      const creditSales = creditOrders.reduce((total, order) => total + order.grandTotal, 0);
+      const paymentsReceived = creditPayments
+        .filter((payment) => normalizeCustomerPhone(payment.phone) === phone)
+        .reduce((total, payment) => total + payment.amount, 0);
+      const latestOrder = [...orders].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )[0];
+
+      return {
+        phone,
+        name: latestOrder?.customerName ?? phone,
+        orderCount: customerOrders.length,
+        completedOrderCount: completedOrders.length,
+        thisMonthOrderCount: thisMonthOrders.length,
+        totalSpent: completedOrders.reduce((total, order) => total + order.grandTotal, 0),
+        creditSales,
+        paymentsReceived,
+        creditBalance: Math.max(0, creditSales - paymentsReceived),
+        monthlyCreditEnabled: db.monthlyCreditAccounts?.[phone]?.enabled ?? false,
+        lastOrderAt: latestOrder?.createdAt ?? '',
+        favourite: thisMonthOrders.length >= 10,
+        payments: creditPayments
+          .filter((payment) => normalizeCustomerPhone(payment.phone) === phone)
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+      };
+    })
+    .sort((a, b) => b.orderCount - a.orderCount);
+}
+
+export async function setMonthlyCreditAccount(phone: string, enabled: boolean): Promise<void> {
+  const key = normalizeCustomerPhone(phone);
+  if (key.length < 10) throw new Error('A valid customer phone number is required.');
+  const db = loadDatabase();
+  db.monthlyCreditAccounts ??= {};
+  db.monthlyCreditAccounts[key] = { enabled, updatedAt: new Date().toISOString() };
+  persistDatabase(db);
+}
+
+export async function addCustomerCreditPayment(
+  phone: string,
+  amount: number,
+  date: string,
+  notes?: string
+): Promise<CustomerCreditPayment> {
+  const key = normalizeCustomerPhone(phone);
+  if (!isValidDateKey(date) || date > getPakistanDateKey(new Date())) {
+    throw new Error('Choose a valid payment date that is today or earlier.');
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Payment amount must be greater than zero.');
+  }
+
+  const db = loadDatabase();
+  db.creditPayments ??= [];
+  const creditPayments = db.creditPayments;
+  const creditOrders = db.orders.filter(
+    (order) =>
+      normalizeCustomerPhone(order.customerPhone) === key &&
+      order.status === 'completed' &&
+      order.paymentMethod === 'monthly_credit'
+  );
+  const creditSales = creditOrders.reduce((total, order) => total + order.grandTotal, 0);
+  const previousPayments = creditPayments
+    .filter((payment) => normalizeCustomerPhone(payment.phone) === key)
+    .reduce((total, payment) => total + payment.amount, 0);
+  const balance = Math.max(0, creditSales - previousPayments);
+  if (amount > balance) {
+    throw new Error(`Payment exceeds the outstanding balance of Rs. ${balance}.`);
+  }
+
+  const payment: CustomerCreditPayment = {
+    id: `PAY-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    phone: key,
+    amount: Math.round(amount * 100) / 100,
+    date,
+    notes: notes?.trim() || undefined,
+    createdAt: new Date().toISOString(),
+  };
+  db.creditPayments.push(payment);
+  persistDatabase(db);
+  return payment;
 }
 
 export async function deleteOrder(orderId: string): Promise<boolean> {
@@ -526,6 +800,7 @@ export async function serverValidateAndCreateOrder(payload: {
   source?: Order['source'];
   initialStatus?: OrderStatus;
   statusNotes?: string;
+  paymentMethod?: Order['paymentMethod'];
 } = {}): Promise<{ order: Order; whatsappUrl: string }> {
   const db = loadDatabase();
 
@@ -536,6 +811,12 @@ export async function serverValidateAndCreateOrder(payload: {
   const cleanPhone = payload.customerPhone.replace(/\D/g, '');
   if (cleanPhone.length < 10) {
     throw new Error('Please provide a valid Pakistani contact phone number (e.g. 0309-4222283).');
+  }
+  if (
+    options.paymentMethod === 'monthly_credit' &&
+    !db.monthlyCreditAccounts?.[normalizeCustomerPhone(payload.customerPhone)]?.enabled
+  ) {
+    throw new Error('This customer is not enabled for a monthly credit account.');
   }
 
   if (payload.orderType === 'delivery') {
@@ -598,6 +879,7 @@ export async function serverValidateAndCreateOrder(payload: {
       validatedItems.push({
         itemType: 'product',
         itemId: product.id,
+        categoryId: product.categoryId,
         nameEn: product.nameEn,
         nameUr: product.nameUr,
         unitPrice: unitTotal,
@@ -621,6 +903,7 @@ export async function serverValidateAndCreateOrder(payload: {
       validatedItems.push({
         itemType: 'deal',
         itemId: deal.id,
+        components: deal.components,
         nameEn: deal.nameEn,
         nameUr: deal.nameUr,
         unitPrice: deal.price,
@@ -711,6 +994,7 @@ export async function serverValidateAndCreateOrder(payload: {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     source: options.source ?? 'website',
+    paymentMethod: options.paymentMethod ?? 'cash',
     customerName: payload.customerName.trim(),
     customerPhone: payload.customerPhone.trim(),
     orderType: payload.orderType,

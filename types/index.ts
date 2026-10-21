@@ -85,12 +85,14 @@ export interface CartItem {
 export interface OrderItemRecord {
   itemType: 'product' | 'deal';
   itemId: string;
+  categoryId?: string;
   nameEn: string;
   nameUr: string;
   unitPrice: number;
   quantity: number;
   addons?: CartItemAddon[];
   specialInstructions?: string;
+  components?: DealComponent[];
   subtotal: number;
 }
 
@@ -100,6 +102,7 @@ export interface Order {
   updatedAt: string;
   completedAt?: string;
   source?: 'website' | 'phone';
+  paymentMethod?: 'cash' | 'monthly_credit';
   customerName: string;
   customerPhone: string;
   orderType: OrderType;
@@ -150,4 +153,37 @@ export interface BusinessSettings {
 export interface AdminUser {
   username: string;
   role: 'owner' | 'manager' | 'staff';
+}
+
+export interface DailyExpense {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  createdAt: string;
+}
+
+export interface CustomerCreditPayment {
+  id: string;
+  phone: string;
+  amount: number;
+  date: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CustomerLead {
+  phone: string;
+  name: string;
+  orderCount: number;
+  completedOrderCount: number;
+  thisMonthOrderCount: number;
+  totalSpent: number;
+  creditSales: number;
+  paymentsReceived: number;
+  creditBalance: number;
+  monthlyCreditEnabled: boolean;
+  lastOrderAt: string;
+  favourite: boolean;
+  payments: CustomerCreditPayment[];
 }

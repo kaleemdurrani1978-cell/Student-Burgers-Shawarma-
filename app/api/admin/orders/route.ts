@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
       ) ||
       (order.tableNumber !== undefined && typeof order.tableNumber !== 'string') ||
       (order.deliveryAddress !== undefined && typeof order.deliveryAddress !== 'string') ||
-      (order.specialInstructions !== undefined && typeof order.specialInstructions !== 'string')
+      (order.specialInstructions !== undefined && typeof order.specialInstructions !== 'string') ||
+      (order.monthlyCredit !== undefined && typeof order.monthlyCredit !== 'boolean')
     ) {
       return NextResponse.json({ success: false, error: 'Please complete all required order details.' }, { status: 400 });
     }
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
         source: 'phone',
         initialStatus: 'pending',
         statusNotes: 'Phone order entered by staff.',
+        paymentMethod: order.monthlyCredit === true ? 'monthly_credit' : 'cash',
       }
     );
 
