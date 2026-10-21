@@ -7,6 +7,7 @@ import Image from 'next/image';
 import {
   LayoutDashboard,
   ShoppingBag,
+  CalendarDays,
   UtensilsCrossed,
   Flame,
   QrCode,
@@ -63,6 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+    { href: '/admin/sales', label: 'Daily Sales', icon: CalendarDays },
     { href: '/admin/menu', label: 'Products', icon: UtensilsCrossed },
     { href: '/admin/deals', label: 'Deals', icon: Flame },
     { href: '/admin/tables', label: 'QR Tables', icon: QrCode },
