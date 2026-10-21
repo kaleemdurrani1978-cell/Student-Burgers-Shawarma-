@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Phone,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 
@@ -30,6 +31,8 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const fetchStats = async () => {
     try {
@@ -64,6 +67,38 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteOrder = async (order: Order) => {
+    if (!window.confirm(`Delete order ${order.id} for ${order.customerName}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingOrderId(order.id);
+    setDeleteError('');
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(order.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete order.');
+      }
+
+      setStats((currentStats) =>
+        currentStats
+          ? {
+              ...currentStats,
+              recentOrders: currentStats.recentOrders.filter((item) => item.id !== order.id),
+            }
+          : currentStats
+      );
+      await fetchStats();
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete order.');
+    } finally {
+      setDeletingOrderId(null);
     }
   };
 
@@ -130,6 +165,12 @@ export default function AdminDashboardPage() {
           <span>Refresh Data</span>
         </button>
       </div>
+
+      {deleteError && (
+        <p role="alert" className="rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-xs text-red-300">
+          {deleteError}
+        </p>
+      )}
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -242,6 +283,16 @@ export default function AdminDashboardPage() {
                   >
                     <Phone className="w-3.5 h-3.5" />
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteOrder(ord)}
+                    disabled={deletingOrderId === ord.id}
+                    className="p-2 rounded-xl bg-red-950/60 border border-red-900 text-red-300 hover:bg-red-900 disabled:cursor-wait disabled:opacity-50 transition-colors"
+                    title={`Delete order ${ord.id}`}
+                    aria-label={`Delete order ${ord.id}`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             ))}
