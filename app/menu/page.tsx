@@ -21,10 +21,11 @@ function MenuContent() {
 
   // Sync category param if query param changes
   useEffect(() => {
-    const cat = searchParams.get('category');
-    if (cat) {
-      startTransition(() => setActiveCategory(cat));
-    }
+    const cat = searchParams.get('category') || 'all';
+    startTransition(() => {
+      setActiveCategory(cat);
+      if (cat === 'all') setSearchQuery('');
+    });
   }, [searchParams]);
 
   // Fetch menu data from API
