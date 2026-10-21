@@ -16,8 +16,17 @@ import {
   Utensils,
   RefreshCw,
   Trash2,
+  Plus,
+  X,
+  LoaderCircle,
 } from 'lucide-react';
-import { Order, OrderStatus } from '@/types';
+import { Deal, Order, OrderStatus, OrderType, Product } from '@/types';
+
+type ManualOrderItem = {
+  itemType: 'product' | 'deal';
+  itemId: string;
+  quantity: number;
+};
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -30,6 +39,22 @@ export default function AdminOrdersPage() {
   const [notesInput, setNotesInput] = useState<string>('');
   const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState('');
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const [submittingManualOrder, setSubmittingManualOrder] = useState(false);
+  const [manualOrderError, setManualOrderError] = useState('');
+  const [manualOrderSuccess, setManualOrderSuccess] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [manualName, setManualName] = useState('');
+  const [manualPhone, setManualPhone] = useState('');
+  const [manualOrderType, setManualOrderType] = useState<OrderType>('takeaway');
+  const [manualTable, setManualTable] = useState('');
+  const [manualAddress, setManualAddress] = useState('');
+  const [manualInstructions, setManualInstructions] = useState('');
+  const [manualSelection, setManualSelection] = useState('');
+  const [manualQuantity, setManualQuantity] = useState(1);
+  const [manualItems, setManualItems] = useState<ManualOrderItem[]>([]);
 
   const fetchOrders = async () => {
     try {
@@ -96,6 +121,126 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const openCreateOrder = async () => {
+    setShowCreateOrder(true);
+    setManualOrderError('');
+    setManualOrderSuccess('');
+    setMenuLoading(true);
+    try {
+      const [productsResponse, dealsResponse] = await Promise.all([
+        fetch('/api/admin/products'),
+        fetch('/api/admin/deals'),
+      ]);
+      const [productsData, dealsData] = await Promise.all([
+        productsResponse.json(),
+        dealsResponse.json(),
+      ]);
+      if (!productsResponse.ok || !productsData.success) {
+        throw new Error(productsData.error || 'Could not load menu products.');
+      }
+      if (!dealsResponse.ok || !dealsData.success) {
+        throw new Error(dealsData.error || 'Could not load menu deals.');
+      }
+      setProducts(productsData.products.filter((product: Product) => product.isAvailable && product.categoryId !== 'addons'));
+      setDeals(dealsData.deals.filter((deal: Deal) => deal.isAvailable));
+    } catch (error) {
+      setManualOrderError(error instanceof Error ? error.message : 'Could not load menu items.');
+    } finally {
+      setMenuLoading(false);
+    }
+  };
+
+  const selectedMenuItem = useMemo(() => {
+    if (!manualSelection) return null;
+    const [itemType, itemId] = manualSelection.split(':');
+    if (itemType === 'product') {
+      const product = products.find((item) => item.id === itemId);
+      return product ? { itemType, itemId, name: product.nameEn, price: product.price } : null;
+    }
+    const deal = deals.find((item) => item.id === itemId);
+    return deal ? { itemType, itemId, name: deal.nameEn, price: deal.price } : null;
+  }, [manualSelection, products, deals]);
+
+  const manualSubtotal = useMemo(
+    () =>
+      manualItems.reduce((total, item) => {
+        const menuItem =
+          item.itemType === 'product'
+            ? products.find((product) => product.id === item.itemId)
+            : deals.find((deal) => deal.id === item.itemId);
+        return total + (menuItem?.price ?? 0) * item.quantity;
+      }, 0),
+    [manualItems, products, deals]
+  );
+
+  const addManualItem = () => {
+    if (!selectedMenuItem) return;
+    const existing = manualItems.find(
+      (item) => item.itemType === selectedMenuItem.itemType && item.itemId === selectedMenuItem.itemId
+    );
+    if (existing && existing.quantity + manualQuantity > 50) {
+      setManualOrderError('You can add up to 50 of the same menu item per order.');
+      return;
+    }
+    setManualOrderError('');
+    setManualItems((current) => {
+      if (existing) {
+        return current.map((item) =>
+          item === existing ? { ...item, quantity: item.quantity + manualQuantity } : item
+        );
+      }
+      return [
+        ...current,
+        {
+          itemType: selectedMenuItem.itemType as 'product' | 'deal',
+          itemId: selectedMenuItem.itemId,
+          quantity: manualQuantity,
+        },
+      ];
+    });
+    setManualQuantity(1);
+  };
+
+  const submitManualOrder = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmittingManualOrder(true);
+    setManualOrderError('');
+    try {
+      const response = await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: manualName,
+          customerPhone: manualPhone,
+          orderType: manualOrderType,
+          tableNumber: manualOrderType === 'dine_in' ? manualTable : undefined,
+          deliveryAddress: manualOrderType === 'delivery' ? manualAddress : undefined,
+          specialInstructions: manualInstructions,
+          items: manualItems,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Could not create phone order.');
+      }
+
+      setOrders((current) => [data.order, ...current.filter((order) => order.id !== data.order.id)]);
+      setManualOrderSuccess(`Phone order ${data.order.id} created.`);
+      setShowCreateOrder(false);
+      setManualItems([]);
+      setManualName('');
+      setManualPhone('');
+      setManualAddress('');
+      setManualTable('');
+      setManualInstructions('');
+      setManualOrderType('takeaway');
+    } catch (error) {
+      setManualOrderError(error instanceof Error ? error.message : 'Could not create phone order.');
+    } finally {
+      setSubmittingManualOrder(false);
+    }
+  };
+
   // CSV Export
   const handleExportCSV = () => {
     if (orders.length === 0) return;
@@ -104,6 +249,7 @@ export default function AdminOrdersPage() {
       'Created At',
       'Customer Name',
       'Customer Phone',
+      'Order Source',
       'Order Type',
       'Table Number',
       'Delivery Address',
@@ -118,6 +264,7 @@ export default function AdminOrdersPage() {
       new Date(o.createdAt).toLocaleString(),
       `"${o.customerName}"`,
       `"${o.customerPhone}"`,
+      o.source ?? 'website',
       o.orderType,
       o.tableNumber || '',
       `"${(o.deliveryAddress || '').replace(/"/g, '""')}"`,
@@ -169,6 +316,13 @@ export default function AdminOrdersPage() {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={openCreateOrder}
+            className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-black px-3.5 py-2 rounded-xl transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Order</span>
+          </button>
+          <button
             onClick={handleExportCSV}
             className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
           >
@@ -188,6 +342,11 @@ export default function AdminOrdersPage() {
       {deleteError && (
         <p role="alert" className="rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-xs text-red-300">
           {deleteError}
+        </p>
+      )}
+      {manualOrderSuccess && (
+        <p role="status" className="rounded-xl border border-emerald-800 bg-emerald-950/50 px-4 py-3 text-xs text-emerald-300">
+          {manualOrderSuccess}
         </p>
       )}
 
@@ -266,6 +425,11 @@ export default function AdminOrdersPage() {
                   <tr key={ord.id} className="hover:bg-zinc-800/40 transition-colors">
                     <td className="px-5 py-4">
                       <span className="font-mono font-bold text-white block">{ord.id}</span>
+                      {ord.source === 'phone' && (
+                        <span className="text-[9px] uppercase tracking-wide text-amber-400 font-black">
+                          Phone order
+                        </span>
+                      )}
                       <span className="text-[10px] text-zinc-500">
                         {new Date(ord.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -412,6 +576,12 @@ export default function AdminOrdersPage() {
                 <span className="text-white font-bold">{selectedOrder.customerName}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-zinc-400">Order Source:</span>
+                <span className="text-amber-400 font-bold uppercase">
+                  {selectedOrder.source === 'phone' ? 'Phone call' : 'Website'}
+                </span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-zinc-400">Contact Phone:</span>
                 <a
                   href={`https://wa.me/${selectedOrder.customerPhone.replace(/\D/g, '')}`}
@@ -433,6 +603,223 @@ export default function AdminOrdersPage() {
                 <div className="pt-2 border-t border-zinc-800">
                   <span className="text-zinc-400 block mb-0.5">Delivery Address:</span>
                   <span className="text-zinc-200">{selectedOrder.deliveryAddress}</span>
+                </div>
+              )}
+
+              {showCreateOrder && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+                  <form
+                    onSubmit={submitManualOrder}
+                    className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl p-5 sm:p-7 space-y-5 my-8"
+                  >
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+                      <div>
+                        <span className="text-[10px] text-amber-400 uppercase font-bold">Staff entry</span>
+                        <h3 className="text-xl font-black text-white">Create Phone Order</h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateOrder(false)}
+                        className="text-zinc-400 hover:text-white p-2"
+                        aria-label="Close create order form"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {manualOrderError && (
+                      <p role="alert" className="rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-xs text-red-300">
+                        {manualOrderError}
+                      </p>
+                    )}
+
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <label className="text-xs text-zinc-300">
+                        Customer name
+                        <input
+                          required
+                          minLength={2}
+                          value={manualName}
+                          onChange={(event) => setManualName(event.target.value)}
+                          className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                          autoComplete="name"
+                        />
+                      </label>
+                      <label className="text-xs text-zinc-300">
+                        Contact phone
+                        <input
+                          required
+                          type="tel"
+                          value={manualPhone}
+                          onChange={(event) => setManualPhone(event.target.value)}
+                          placeholder="03xx-xxxxxxx"
+                          className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                          autoComplete="tel"
+                        />
+                      </label>
+                      <label className="text-xs text-zinc-300">
+                        Order type
+                        <select
+                          value={manualOrderType}
+                          onChange={(event) => setManualOrderType(event.target.value as OrderType)}
+                          className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                        >
+                          <option value="takeaway">Takeaway / Pickup</option>
+                          <option value="delivery">Home delivery</option>
+                          <option value="dine_in">Dine-in</option>
+                        </select>
+                      </label>
+                      {manualOrderType === 'delivery' && (
+                        <label className="text-xs text-zinc-300">
+                          Delivery address
+                          <input
+                            required
+                            minLength={5}
+                            value={manualAddress}
+                            onChange={(event) => setManualAddress(event.target.value)}
+                            className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                            autoComplete="street-address"
+                          />
+                        </label>
+                      )}
+                      {manualOrderType === 'dine_in' && (
+                        <label className="text-xs text-zinc-300">
+                          Table number
+                          <input
+                            value={manualTable}
+                            onChange={(event) => setManualTable(event.target.value.toUpperCase())}
+                            placeholder="e.g. T01"
+                            className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-black text-white">Order items</h4>
+                      {menuLoading ? (
+                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                          <LoaderCircle className="w-4 h-4 animate-spin" />
+                          Loading available menu items...
+                        </div>
+                      ) : (
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <select
+                            value={manualSelection}
+                            onChange={(event) => setManualSelection(event.target.value)}
+                            className="min-w-0 flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white"
+                          >
+                            <option value="">Choose a product or deal</option>
+                            {products.length > 0 && (
+                              <optgroup label="Products">
+                                {products.map((product) => (
+                                  <option key={product.id} value={`product:${product.id}`}>
+                                    {product.nameEn} — Rs. {product.price}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                            {deals.length > 0 && (
+                              <optgroup label="Deals">
+                                {deals.map((deal) => (
+                                  <option key={deal.id} value={`deal:${deal.id}`}>
+                                    {deal.nameEn} — Rs. {deal.price}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                          </select>
+                          <input
+                            aria-label="Item quantity"
+                            type="number"
+                            min={1}
+                            max={50}
+                            value={manualQuantity}
+                            onChange={(event) => setManualQuantity(Math.max(1, Math.min(50, Number(event.target.value) || 1)))}
+                            className="w-20 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={addManualItem}
+                            disabled={
+                              !selectedMenuItem ||
+                              manualItems.some(
+                                (item) =>
+                                  item.itemType === selectedMenuItem.itemType &&
+                                  item.itemId === selectedMenuItem.itemId &&
+                                  item.quantity + manualQuantity > 50
+                              )
+                            }
+                            className="inline-flex items-center justify-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-white text-xs font-bold px-3 py-2.5 rounded-xl"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            Add
+                          </button>
+                        </div>
+                      )}
+                      {manualItems.length > 0 && (
+                        <div className="max-h-48 overflow-y-auto rounded-xl border border-zinc-800 divide-y divide-zinc-800">
+                          {manualItems.map((item) => {
+                            const menuItem =
+                              item.itemType === 'product'
+                                ? products.find((product) => product.id === item.itemId)
+                                : deals.find((deal) => deal.id === item.itemId);
+                            return (
+                              <div key={`${item.itemType}:${item.itemId}`} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                                <span className="text-zinc-200">{menuItem?.nameEn ?? item.itemId} × {item.quantity}</span>
+                                <div className="flex items-center gap-3">
+                                  <span className="font-bold text-amber-400">Rs. {(menuItem?.price ?? 0) * item.quantity}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setManualItems((current) => current.filter((line) => line !== item))}
+                                    className="text-zinc-500 hover:text-red-300"
+                                    aria-label={`Remove ${menuItem?.nameEn ?? item.itemId}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          <div className="flex justify-between px-3 py-2 text-xs font-black text-white">
+                            <span>Subtotal preview</span>
+                            <span className="text-amber-400">Rs. {manualSubtotal}</span>
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-[10px] text-zinc-500">
+                        Final prices, delivery minimum, and delivery charges are checked by the server when you submit.
+                      </p>
+                    </div>
+
+                    <label className="block text-xs text-zinc-300">
+                      Special instructions <span className="text-zinc-500">(optional)</span>
+                      <textarea
+                        rows={2}
+                        value={manualInstructions}
+                        onChange={(event) => setManualInstructions(event.target.value)}
+                        className="mt-1 w-full resize-y bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white"
+                      />
+                    </label>
+
+                    <div className="flex justify-end gap-2 border-t border-zinc-800 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateOrder(false)}
+                        className="px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-300 hover:bg-zinc-900"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={submittingManualOrder || menuLoading || manualItems.length === 0}
+                        className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-zinc-950 font-black px-4 py-2.5 rounded-xl text-xs"
+                      >
+                        {submittingManualOrder && <LoaderCircle className="w-4 h-4 animate-spin" />}
+                        Create order
+                      </button>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>

@@ -21,6 +21,7 @@ import {
 
 interface DatabaseSchema {
   dealMenuVersion?: number;
+  dailySales?: Record<string, { total: number; orderCount: number; closedAt: string }>;
   products: Product[];
   deals: Deal[];
   categories: Category[];
@@ -207,6 +208,16 @@ function loadDatabase(): DatabaseSchema {
         database.dealMenuVersion = 9;
         persistDatabase(database);
       }
+      if ((database.dealMenuVersion ?? 0) < 10) {
+        database.dailySales ??= {};
+        database.orders = database.orders.map((order) =>
+          order.status === 'completed' && !order.completedAt
+            ? { ...order, completedAt: order.updatedAt }
+            : order
+        );
+        database.dealMenuVersion = 10;
+        persistDatabase(database);
+      }
       if (database.settings?.restaurantName === 'Student Shawarma & Fast Food') {
         database.settings.restaurantName = initialBusinessSettings.restaurantName;
         database.settings.urduName = initialBusinessSettings.urduName;
@@ -220,7 +231,8 @@ function loadDatabase(): DatabaseSchema {
 
   // Initialize fresh defaults
   memoryCache = {
-    dealMenuVersion: 9,
+    dealMenuVersion: 10,
+    dailySales: {},
     products: [...initialProducts],
     deals: [...initialDeals],
     categories: [...initialCategories],
@@ -398,6 +410,89 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
   return db.orders.find((o) => o.id === id);
 }
 
+const pakistanDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Asia/Karachi',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+function getPakistanDateKey(date: Date): string {
+  const parts = Object.fromEntries(
+    pakistanDateFormatter.formatToParts(date).map((part) => [part.type, part.value])
+  );
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+export async function getDailySalesReport(month: string, selectedDate: string) {
+  const db = loadDatabase();
+  db.dailySales ??= {};
+
+  const today = getPakistanDateKey(new Date());
+  const [year, monthNumber] = month.split('-').map(Number);
+  const daysInMonth = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+  let ledgerChanged = false;
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = `${month}-${String(day).padStart(2, '0')}`;
+    if (date >= today || db.dailySales[date]) continue;
+
+    const completedOrders = db.orders.filter((order) => {
+      if (order.status !== 'completed') return false;
+      const completedAt = order.completedAt ?? order.updatedAt;
+      return getPakistanDateKey(new Date(completedAt)) === date;
+    });
+
+    db.dailySales[date] = {
+      total: completedOrders.reduce((total, order) => total + order.grandTotal, 0),
+      orderCount: completedOrders.length,
+      closedAt: new Date().toISOString(),
+    };
+    ledgerChanged = true;
+  }
+
+  const completedOrders = db.orders.filter((order) => order.status === 'completed');
+  const dailySales: Record<string, { total: number; orderCount: number; closed: boolean }> = {};
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = `${month}-${String(day).padStart(2, '0')}`;
+    const closing = db.dailySales[date];
+    if (closing) {
+      dailySales[date] = { total: closing.total, orderCount: closing.orderCount, closed: true };
+      continue;
+    }
+    if (date === today) {
+      const todaysOrders = completedOrders.filter((order) =>
+        getPakistanDateKey(new Date(order.completedAt ?? order.updatedAt)) === date
+      );
+      dailySales[date] = {
+        total: todaysOrders.reduce((total, order) => total + order.grandTotal, 0),
+        orderCount: todaysOrders.length,
+        closed: false,
+      };
+    }
+  }
+
+  if (ledgerChanged) persistDatabase(db);
+
+  const dayOrders = selectedDate === today || db.dailySales[selectedDate]
+    ? completedOrders
+        .filter((order) => getPakistanDateKey(new Date(order.completedAt ?? order.updatedAt)) === selectedDate)
+        .sort(
+          (a, b) =>
+            new Date(b.completedAt ?? b.updatedAt).getTime() -
+            new Date(a.completedAt ?? a.updatedAt).getTime()
+        )
+    : [];
+
+  return {
+    monthlyTotal: Object.values(dailySales).reduce((total, sales) => total + sales.total, 0),
+    monthlyOrderCount: Object.values(dailySales).reduce((total, sales) => total + sales.orderCount, 0),
+    dailySales,
+    dayOrders,
+  };
+}
+
 export async function deleteOrder(orderId: string): Promise<boolean> {
   const db = loadDatabase();
   const orderIndex = db.orders.findIndex((order) => order.id === orderId);
@@ -427,7 +522,11 @@ export async function serverValidateAndCreateOrder(payload: {
     addons?: Array<{ id: string; nameEn: string; price: number }>;
     specialInstructions?: string;
   }>;
-}): Promise<{ order: Order; whatsappUrl: string }> {
+}, options: {
+  source?: Order['source'];
+  initialStatus?: OrderStatus;
+  statusNotes?: string;
+} = {}): Promise<{ order: Order; whatsappUrl: string }> {
   const db = loadDatabase();
 
   if (!payload.customerName || payload.customerName.trim().length < 2) {
@@ -611,6 +710,7 @@ export async function serverValidateAndCreateOrder(payload: {
     id: orderId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    source: options.source ?? 'website',
     customerName: payload.customerName.trim(),
     customerPhone: payload.customerPhone.trim(),
     orderType: payload.orderType,
@@ -621,7 +721,8 @@ export async function serverValidateAndCreateOrder(payload: {
     itemsSubtotal: calculatedSubtotal,
     deliveryCharges: deliveryFee,
     grandTotal: grandTotal,
-    status: 'awaiting_whatsapp',
+    status: options.initialStatus ?? 'awaiting_whatsapp',
+    statusNotes: options.statusNotes,
     whatsappMessagePrefilled: fullTextMessage,
     whatsappSentDeclaredByUser: false,
   };
@@ -642,8 +743,14 @@ export async function updateOrderStatus(
   const order = db.orders.find((o) => o.id === orderId);
   if (!order) return null;
 
+  const now = new Date().toISOString();
+  if (status === 'completed' && order.status !== 'completed') {
+    order.completedAt = now;
+  } else if (status !== 'completed' && order.status === 'completed') {
+    delete order.completedAt;
+  }
   order.status = status;
-  order.updatedAt = new Date().toISOString();
+  order.updatedAt = now;
   if (statusNotes !== undefined) order.statusNotes = statusNotes;
   if (estimatedMinutes !== undefined) order.estimatedMinutes = estimatedMinutes;
 

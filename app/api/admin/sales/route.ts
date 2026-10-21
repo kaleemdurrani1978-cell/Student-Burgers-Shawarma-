@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrders } from '@/lib/db';
+import { getDailySalesReport } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
-
-const pakistanDateFormatter = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Asia/Karachi',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-function getPakistanDateKey(date: Date): string {
-  const parts = Object.fromEntries(
-    pakistanDateFormatter.formatToParts(date).map((part) => [part.type, part.value])
-  );
-  return `${parts.year}-${parts.month}-${parts.day}`;
-}
 
 export async function GET(req: NextRequest) {
   const unauthorized = requireAdmin(req);
@@ -37,31 +23,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const completedOrders = (await getOrders()).filter((order) => order.status === 'completed');
-    const monthlyOrders = completedOrders.filter((order) =>
-      getPakistanDateKey(new Date(order.createdAt)).startsWith(`${month}-`)
-    );
-    const dailySales: Record<string, { total: number; orderCount: number }> = {};
-
-    for (const order of monthlyOrders) {
-      const day = getPakistanDateKey(new Date(order.createdAt));
-      const summary = dailySales[day] ?? { total: 0, orderCount: 0 };
-      summary.total += order.grandTotal;
-      summary.orderCount += 1;
-      dailySales[day] = summary;
-    }
-
-    const dayOrders = selectedDate
-      ? monthlyOrders.filter((order) => getPakistanDateKey(new Date(order.createdAt)) === selectedDate)
-      : [];
-
+    const report = await getDailySalesReport(month, selectedDate ?? '');
     return NextResponse.json({
       success: true,
       month,
-      monthlyTotal: monthlyOrders.reduce((total, order) => total + order.grandTotal, 0),
-      monthlyOrderCount: monthlyOrders.length,
-      dailySales,
-      dayOrders,
+      ...report,
     });
   } catch {
     return NextResponse.json(

@@ -7,6 +7,7 @@ import { Order } from '@/types';
 interface DailySales {
   total: number;
   orderCount: number;
+  closed: boolean;
 }
 
 interface SalesReport {
@@ -130,7 +131,7 @@ export default function DailySalesPage() {
       <div>
         <h1 className="text-2xl font-black text-white sm:text-3xl">Daily Sales</h1>
         <p className="mt-1 text-xs text-zinc-400">
-          Review completed-order sales by calendar date. Dates use Pakistan Standard Time.
+          Check daily completed sales and closing amounts. Dates use Pakistan Standard Time.
         </p>
       </div>
 
@@ -162,7 +163,9 @@ export default function DailySalesPage() {
             {loading ? 'Loading…' : formatRupees(report?.dailySales[selectedDate]?.total ?? 0)}
           </p>
           <p className="mt-1 text-xs text-zinc-400">
-            {report?.dailySales[selectedDate]?.orderCount ?? 0} completed orders
+            {report?.dailySales[selectedDate]?.closed
+              ? `Closing amount · ${report.dailySales[selectedDate].orderCount} completed orders`
+              : `${report?.dailySales[selectedDate]?.orderCount ?? 0} completed orders · live total`}
           </p>
         </section>
       </div>
@@ -233,7 +236,9 @@ export default function DailySalesPage() {
                 )}
                 {sales && (
                   <span className="block text-[9px] text-zinc-500">
-                    {sales.orderCount} order{sales.orderCount === 1 ? '' : 's'}
+                    {sales.closed
+                      ? `Closing · ${sales.orderCount} order${sales.orderCount === 1 ? '' : 's'}`
+                      : `${sales.orderCount} order${sales.orderCount === 1 ? '' : 's'}`}
                   </span>
                 )}
               </button>
@@ -242,7 +247,7 @@ export default function DailySalesPage() {
         </div>
         <p className="mt-4 flex items-center gap-2 text-[11px] text-zinc-500">
           <RefreshCw className="h-3 w-3" />
-          Only completed orders count as sales. Cancelled, pending, and unconfirmed orders are excluded.
+          Completed orders count as sales. Each past date saves a closing amount that remains on the calendar.
         </p>
       </section>
 
@@ -267,7 +272,7 @@ export default function DailySalesPage() {
                       timeZone: 'Asia/Karachi',
                       hour: '2-digit',
                       minute: '2-digit',
-                    }).format(new Date(order.createdAt))}
+                    }).format(new Date(order.completedAt ?? order.updatedAt))}
                   </p>
                 </div>
                 <span className="font-black text-amber-400">{formatRupees(order.grandTotal)}</span>

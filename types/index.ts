@@ -98,6 +98,8 @@ export interface Order {
   id: string; // e.g., SS-8492
   createdAt: string;
   updatedAt: string;
+  completedAt?: string;
+  source?: 'website' | 'phone';
   customerName: string;
   customerPhone: string;
   orderType: OrderType;
